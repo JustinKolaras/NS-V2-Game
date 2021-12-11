@@ -6,6 +6,4 @@ return function (Context, Players)
 			player.Character.HumanoidRootPart.CFrame = toCFrame
 		end
 	end
-
-	return "Done."
 end

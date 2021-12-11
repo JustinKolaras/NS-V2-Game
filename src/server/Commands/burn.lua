@@ -1,7 +1,7 @@
 return {
 	Name = "burn";
 	Aliases =  {};
-	Description = "Fun Command - Burns and unanchors the entire Workspace. IRREVERSIBLE";
+	Description = "Fun Command - Burns and unanchors the entire Workspace. IRREVERSIBLE!!";
 	Group = "Owner";
 	Args = {
 		{
