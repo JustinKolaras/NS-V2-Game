@@ -1,9 +1,13 @@
-wait()  
+task.wait()
+
+local Market = game:GetService("MarketplaceService")
+
+local Character = 
 
 local char,NameTag,plr,MarketplaceService = script.Parent,script:FindFirstChild('NameTag'),game.Players:GetPlayerFromCharacter(script.Parent),game:GetService('MarketplaceService')
 NameTag.Enabled = false
 
-local UserString,RankString = Instance.new('StringValue',char),Instance.new('StringValue',char)
+local UserString,RankString = Instance.new('StringValue'), Instance.new('StringValue')
 UserString.Name = 'Username'
 UserString.Value = char.Name
 RankString.Name = 'GroupRank'
@@ -19,21 +23,6 @@ local ClonedVIP = ClonedFrame:FindFirstChild('VIP')
 NameTagClone.Parent = char:FindFirstChild('Head')
 NameTagClone.Adornee = char:FindFirstChild('Head')
 NameTagClone.StudsOffset = Vector3.new(0,2.25,0)
-
-local function cc(s)
-	if not s:match("-") then
-		local lowered = s:lower()
-		local newStr = string.sub(lowered,1,1):upper()..string.sub(lowered,2)
-		return newStr
-	else
-		local match = s:match("%p%a+")
-		local pre = s:match("^%a+").."-"
-		local fixedPre = string.sub(pre:lower(),1,1):upper()..string.sub(pre:lower(),2) 
-		local lowered = match:lower()
-		local newStr = fixedPre..string.sub(lowered,2,2):upper()..string.sub(lowered,3)
-		return newStr
-	end
-end
 
 ClonedUser.Text = UserString.Value
 ClonedUser.TextStrokeTransparency = .85
