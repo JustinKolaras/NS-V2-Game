@@ -4,16 +4,16 @@ local Players = game:GetService("Players")
 local Chat = require(game.ServerScriptService:WaitForChild("ChatServiceRunner"):WaitForChild("ChatService"))
 local Market = game:GetService("MarketplaceService")
 
-local BanService = require(ServerStorage.Modules['BanService'])
-local ChatTags = require(ServerStorage.Modules['ChatTags'])
-local Lock = require(ServerStorage.Modules.Lock)
+local BanService = require(ServerStorage.Storage.Modules.BanService)
+local ChatTags = require(ServerStorage.Storage.Modules.ChatTags)
+local Lock = require(ServerStorage.Storage.Modules.Lock)
 
 function getTag(Player)
 	local getGroupRank = Player:GetRankInGroup(8046949)
-	local tag,color,textColor
-	for a,b in next,ChatTags do 
+	local tag, color, textColor
+	for a, b in next,ChatTags do 
 		if (b.Users) and (typeof(b.Users) == "table") then
-			for c,d in next,b.Users do
+			for _, d in next,b.Users do
 				if Player.UserId == d then
 					tag,color = a,b.Color
 					if b.Chat then
@@ -44,19 +44,18 @@ end
 
 Players.PlayerAdded:Connect(function(Player)
 	local Banned, Reason, ExecutorId = BanService:GetBanInfo(Player.UserId)
-	local Format = require(ServerStorage.Modules['ModFormats'])
 	if Banned then
-		Player:Kick( Format('Ban', ExecutorId, Reason) )
+		return Player:Kick( ("\nBanned from all servers!\nModerator: %s\nReason: %s"):format( Players:GetNameFromUserIdAsync(ExecutorId), Reason) )
 	end
 
 	local lockStatus, lockReason = Lock:Status()
 	if lockStatus and #lockReason > 0 then
-		Player:Kick("\nLocked\n"..lockReason)
+		return Player:Kick("\nLocked\n"..lockReason)
 	elseif lockStatus then
-		Player:Kick("This server is locked.")
+		return Player:Kick("This server is locked.")
 	end
 	
-	if Market:UserOwnsGamePassAsync(Player.UserId, 13375778) then
+	if Market:UserOwnsGamePassAsync(Player.UserId, 13375778) then -- VIP Gamepass
 		local cola = ServerStorage.Tools.Cola
 		local colaClone = cola:Clone()
 		colaClone.Parent = Player:WaitForChild("StarterGear")
@@ -78,18 +77,11 @@ Chat.SpeakerAdded:Connect(function(playerName)
 end)
 
 pcall(function()
-	Messaging:SubscribeAsync('Servers:Kick', function(dataTable)
+	Messaging:SubscribeAsync("Servers:Kick", function(dataTable)
 		dataTable = dataTable.Data
 		local playerObject = Players:GetPlayerByUserId(dataTable.UserId)
 		if playerObject then
 			playerObject:Kick(dataTable.Reason)
-		end
-	end)
-	
-	Messaging:SubscribeAsync('Servers:Shutdown', function(dataTable)
-		dataTable = dataTable.Data
-		for a,b in next,Players:GetPlayers() do
-			b:Kick(dataTable.Text)
 		end
 	end)
 end)

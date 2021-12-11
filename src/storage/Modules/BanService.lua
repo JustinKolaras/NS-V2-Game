@@ -27,7 +27,7 @@ local retry = {}
 --
 
 function retry.Set(dataStore, dataKey, count, data)
-	return Promise.new(function(resolve,reject)
+	return Promise.new(function(resolve, reject)
 		count = tonumber(count)
 		local ok,result
 		for _ = 1,count do
@@ -49,7 +49,7 @@ function retry.Set(dataStore, dataKey, count, data)
 end
 
 function retry.Get(dataStore, dataKey, count)
-	return Promise.new(function(resolve,reject)
+	return Promise.new(function(resolve, reject)
 		count = tonumber(count)
 		local ok,result,data
 		for _ = 1,count do
@@ -68,7 +68,7 @@ function retry.Get(dataStore, dataKey, count)
 end
 
 function retry.Remove(dataStore, dataKey, count)
-	return Promise.new(function(resolve,reject)
+	return Promise.new(function(resolve, reject)
 		count = tonumber(count)
 		local ok,result
 		for _ = 1,count do
