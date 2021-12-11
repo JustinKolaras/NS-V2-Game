@@ -1,18 +1,18 @@
-local l = {}
-local isLocked,lockReason,contextExecutor = false,"",nil
+local LockModule = {}
+local isLocked, lockReason, contextExecutor = false, "", nil
 
-function l:Lock(r,e)
+function LockModule:Lock(reason, executor)
 	if isLocked and #lockReason > 0 then
 		return "Already locked: "..lockReason.." ("..tostring(contextExecutor)..")"
 	elseif isLocked then
 		return "Already locked. ("..tostring(contextExecutor)..")"
 	end
 	isLocked = true
-	lockReason = r or ""
-	contextExecutor = e
+	lockReason = reason or ""
+	contextExecutor = executor
 end
 
-function l:Unlock()
+function LockModule:Unlock()
 	if not isLocked then
 		return "Not locked."
 	end
@@ -21,8 +21,8 @@ function l:Unlock()
 	contextExecutor = nil
 end
 
-function l:Status()
-	return isLocked,lockReason,contextExecutor
+function LockModule:Status()
+	return isLocked, lockReason, contextExecutor
 end
 
-return l
+return LockModule

@@ -1,6 +1,7 @@
-local SS = game:GetService("ServerStorage")
-local SSS = game:GetService("ServerScriptService")
-local Cmdr = require(SSS.Cmdr)
+local ServerStorage = game:GetService("ServerStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 
-Cmdr:RegisterCommandsIn(SSS:WaitForChild("Commands"))
-Cmdr:RegisterHooksIn(SS:WaitForChild("Cmdr").Hooks)
+local Cmdr = require(ServerScriptService.Server.Cmdr)
+
+Cmdr:RegisterCommandsIn(ServerScriptService:WaitForChild("Commands"))
+Cmdr:RegisterHooksIn(ServerStorage:WaitForChild('Cmdr').Hooks)

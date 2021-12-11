@@ -1,29 +1,29 @@
-local key = {}
+local Key = {}
 
 local moduleConfig = {
 	used = {},
 }
 
-function key.new(Chars)
-	local Key = '_.'
-	for i = 1,Chars do
-		Key = Key..string.char(math.random(127))
+function Key.new(Chars)
+	local currentKey = '_.'
+	for _ = 1,Chars do
+		currentKey = currentKey..string.char(math.random(127))
 	end
 	
-	if not moduleConfig.used[Key] then
-		table.insert(moduleConfig.used, Key)
-		return Key 
+	if not moduleConfig.used[currentKey] then
+		table.insert(moduleConfig.used, currentKey)
+		return currentKey 
 	else
 		repeat
 			task.wait(.1)
-			Key = '_.'
-			for i=1,Chars do
-				Key = Key..string.char(math.random(127))
+			currentKey = '_.'
+			for _ = 1,Chars do
+				currentKey = currentKey..string.char(math.random(127))
 			end
-		until not moduleConfig.used[Key]
-		table.insert(moduleConfig.used, Key)
-		return Key
+		until not moduleConfig.used[currentKey]
+		table.insert(moduleConfig.used, currentKey)
+		return currentKey
 	end
 end
 
-return key
+return Key

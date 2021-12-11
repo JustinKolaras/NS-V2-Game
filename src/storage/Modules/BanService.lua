@@ -13,7 +13,6 @@ if RunService:IsClient() then
 end
 
 local DataStoreService = game:GetService("DataStoreService")
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BanStore = DataStoreService:GetDataStore("PlayerBanStore")
 
@@ -27,11 +26,11 @@ local retry = {}
 
 --
 
-function retry.Set(plr, dataStore, dataKey, count, data)
+function retry.Set(dataStore, dataKey, count, data)
 	return Promise.new(function(resolve,reject)
 		count = tonumber(count)
 		local ok,result
-		for i = 1,count do
+		for _ = 1,count do
 			ok,result = pcall(
 				dataStore.SetAsync, 
 				dataStore, 
@@ -43,17 +42,17 @@ function retry.Set(plr, dataStore, dataKey, count, data)
 			end
 			task.wait(.1)
 		end
-		if (not ok) then
+		if not ok then
 			reject( result )
 		end
 	end)
 end
 
-function retry.Get(plr, dataStore, dataKey, count)
+function retry.Get(dataStore, dataKey, count)
 	return Promise.new(function(resolve,reject)
 		count = tonumber(count)
 		local ok,result,data
-		for i = 1,count do
+		for _ = 1,count do
 			ok,result = pcall(function()
 				data = dataStore:GetAsync(dataKey)
 			end)
@@ -62,17 +61,17 @@ function retry.Get(plr, dataStore, dataKey, count)
 			end
 			task.wait(.1)
 		end
-		if (not ok) then
+		if not ok then
 			reject( result )
 		end
 	end)
 end
 
-function retry.Remove(plr, dataStore, dataKey, count)
+function retry.Remove(dataStore, dataKey, count)
 	return Promise.new(function(resolve,reject)
 		count = tonumber(count)
 		local ok,result
-		for i = 1,count do
+		for _ = 1,count do
 			ok,result = pcall(
 				dataStore.RemoveAsync, 
 				dataStore, 
@@ -83,7 +82,7 @@ function retry.Remove(plr, dataStore, dataKey, count)
 			end
 			task.wait(.1)
 		end
-		if (not ok) then
+		if not ok then
 			reject( result )
 		end		
 	end)
@@ -92,7 +91,7 @@ end
 --
 
 function banService:Add(Id, Executor, Reason)
-	local Succ,Err = pcall( 
+	local _, Err = pcall( 
 		BanStore.SetAsync,
 		BanStore,
 		Settings.storeKey..Id, 
@@ -100,7 +99,7 @@ function banService:Add(Id, Executor, Reason)
 	)
 	if Err then
 		local err
-		retry.Set(nil, BanStore, Settings.storeKey..Id, 5, {true,Executor,Reason} ):catch(function(errorMsg)
+		retry.Set(nil, BanStore, Settings.storeKey..Id, 5, {true, Executor, Reason} ):catch(function(errorMsg)
 			err = errorMsg
 		end):await()
 		if err then
@@ -110,16 +109,16 @@ function banService:Add(Id, Executor, Reason)
 end
 
 function banService:Remove(Id)
-	local Succ,Err = pcall(
+	local _, Err = pcall(
 		BanStore.RemoveAsync, 
 		BanStore,
 		Settings.storeKey..Id
 	)
-	if not Succ then
+	if Err then
 		local err
 		retry.Remove(nil, BanStore, Settings.storeKey..Id, 5):catch(function(errorMsg)
 			err = errorMsg
-		end)
+		end):await()
 		if err then
 			return "Error: "..err
 		end
@@ -127,19 +126,19 @@ function banService:Remove(Id)
 end
 
 function banService:GetBanInfo(Id)
-	local isBanned,executorId,banReason
+	local isBanned, executorId, banReason
 	
-	local Succ,Err = pcall(function()
+	local _, Err = pcall(function()
 		local getData = BanStore:GetAsync( Settings.storeKey..Id )
 		if getData ~= nil then
 			isBanned,executorId,banReason = unpack(getData)
 		end
 	end)
 	
-	if not Succ then
+	if Err then
 		local err
 		retry.Get(nil, BanStore, Settings.storeKey..Id, 5):andThen(function(result)
-			isBanned,executorId,banReason = unpack(result)
+			isBanned, executorId, banReason = unpack(result)
 		end):catch(function(errorMsg)
 			err = errorMsg
 		end)
@@ -148,7 +147,7 @@ function banService:GetBanInfo(Id)
 		end
 	end
 
-	return isBanned,banReason,executorId
+	return isBanned, banReason, executorId
 end
 
 --

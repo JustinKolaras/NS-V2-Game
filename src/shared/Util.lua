@@ -34,6 +34,7 @@ end
 
     @param Parent Instance -- The parent of which is looking for a child
     @param Class Class -- The class of the child you want to retrieve
+	@param Timeout Number -- The timeout, in seconds, of this function to automatically resolve
     @return Promise<Instance> -- Returns the ancestor
 ]=]
 function util:WaitForChildOfClass(Parent, Class, Timeout)
@@ -67,30 +68,36 @@ function util:WaitForChildOfClass(Parent, Class, Timeout)
 	end)
 end
 
--- Waits for the specified object to receive a new parent.
--- If p is provided, it will only return the result if p is the new parent.
--- If after the timeout (in seconds), there is still no new parent, this function will cancel and resolve.
--- Returns Promise (result)
-function util:WaitForNewParent(obj, timeout, p)
+--[=[
+    Uses the Promise library to wait for a child to receive a new parent.
+	If a parent is provided, this function will only return a result if the new parent matches such.
+    If after the timeout (in seconds), there is still no valid child, this function will cancel and resolve.
+
+    @param Object Instance -- The object to receive a new parent
+    @param Timeout Number -- The timeout, in seconds, of this function to automatically resolve
+	@param Parent? Instance -- The optional parent object to validate before resolving
+    @return Promise<Instance> -- Returns the object
+]=]
+function util:WaitForNewParent(Object, Timeout, Parent)
 	return Promise.new(function(resolve)
 		local temp
 		local disregard
-		if p and obj.Parent == p then
+		if Parent and Object.Parent == Parent then
 			disregard = true
-			resolve(obj.Parent)
+			resolve(Object.Parent)
 		end
 		if not disregard then
-			temp = obj:GetPropertyChangedSignal("Parent"):Connect(function(it)
-				if (p and it == p) or (not p) then
+			temp = Object:GetPropertyChangedSignal("Parent"):Connect(function(it)
+				if (Parent and it == Parent) or (not Parent) then
 					disregard = true
 					temp:Disconnect()
 					temp = nil
 					resolve(it)
 				end
 			end)
-			Promise.delay(timeout):andThen(function()
+			Promise.delay(Timeout):andThen(function()
 				if not disregard then 
-					warn(("Timeout reached on:\n%s waiting for a new parent"):format(tostring(obj)))
+					warn(("Timeout reached on:\n%s waiting for a new parent"):format(tostring(Object)))
 					if (temp) and (temp.Connected) then
 						temp:Disconnect()
 						temp = nil
@@ -102,38 +109,55 @@ function util:WaitForNewParent(obj, timeout, p)
 	end)
 end
 
--- Creates an instance with the provided properties.
--- Returns the instance created
-function util:Create(obj, properties)
-	local toReturn = Instance.new(obj)
-	if properties then
-		for a,b in next,properties do
+--[=[
+	Creates an instance with the provided properties.
+
+    @param Object Class -- The class of the object to create
+    @param Properties Table -- Key-value pair table representing k as the property and v as the value
+    @return Instance -- Returns the object created
+]=]
+function util:Create(Object, Properties)
+	local toReturn = Instance.new(Object)
+	if Properties then
+		for a,b in next,Properties do
 			toReturn[a] = b
 		end
 	end
 	return toReturn
 end
 
--- Clones an instance with the provided properties.
--- Returns the instance cloned
-function util:Clone(obj, properties)
-	local toReturn = obj:Clone()
-	if properties then
-		for a,b in next,properties do
+--[=[
+	Clones an instance with the provided properties.
+
+    @param Object Instance -- The object to clone from
+    @param Properties Table -- Key-value pair table representing k as the property and v as the value
+    @return Instance -- Returns the cloned object
+]=]
+function util:Clone(Object, Properties)
+	local toReturn = Object:Clone()
+	if Properties then
+		for a,b in next,Properties do
 			toReturn[a] = b
 		end
 	end
 	return toReturn
 end
 
--- Moves all children in obj1 to obj2. If dObj1 is true, obj1 will be destroyed after all children were moved.
--- Returns nothing
-function util:MoveChildren(obj1, obj2, dObj1)
-	for a,b in next,obj1:GetChildren() do
-		b.Parent = obj2
+--[=[
+	Moves children from Previous to Next.
+	If shouldDelete is true, Previous will be destroyed after the conversion has been made.
+
+    @param Previous Instance -- The instance to move children from
+	@param Next Instance -- The instance to move children to
+	@param shouldDelete? Boolean -- Specifies if Previous should be deleted after the conversion
+    @return void
+]=]
+function util:MoveChildren(Previous, Next, shouldDelete)
+	for _, b in next,Previous:GetChildren() do
+		b.Parent = Next
 	end
-	if dObj1 then
-		obj1:Destroy()
+	if shouldDelete then
+		Previous:Destroy()
 	end
 end
 

@@ -1,20 +1,15 @@
 local ServerStorage = game:GetService("ServerStorage")
 local Players = game:GetService("Players")
-local Http = game:GetService("HttpService")
 
-local BanService = require(ServerStorage.Modules['BanService'])
-local Format = require(ServerStorage.Modules['ModFormats'])
+local BanService = require(ServerStorage.Storage.Modules.BanService)
 
 return function (Context, Player)
-
 	local Executor = Context.Executor
-	local PlayerBanned,BanReason,ExecutorId = BanService:GetBanInfo(Player)
+	local PlayerBanned, BanReason, ExecutorId = BanService:GetBanInfo(Player)
 
-	-- See if they are attempting to perform actions on themselves.
 	if Player == Executor.UserId then
 		return "You can't perform this action on yourself."
 	end
-	-- See if the Player is banned.
 	if not PlayerBanned then
 		return Players:GetNameFromUserIdAsync(Player).." is not banned."
 	end
