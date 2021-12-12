@@ -35,10 +35,12 @@
         },
 
         "StarterPack": {
+            "$className": "StarterPack",
             "$path": "src/backpack"
         },
 
         "StarterGui": {
+            "$className": "StarterGui",
             "$path": "src/gui"
         },
 

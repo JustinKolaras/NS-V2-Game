@@ -5,20 +5,20 @@ local moduleConfig = {
 }
 
 function Key.new(Chars)
-	local currentKey = '_.'
-	for _ = 1,Chars do
-		currentKey = currentKey..string.char(math.random(127))
+	local currentKey = "_."
+	for _ = 1, Chars do
+		currentKey = currentKey .. string.char(math.random(127))
 	end
-	
+
 	if not moduleConfig.used[currentKey] then
 		table.insert(moduleConfig.used, currentKey)
-		return currentKey 
+		return currentKey
 	else
 		repeat
-			task.wait(.1)
-			currentKey = '_.'
-			for _ = 1,Chars do
-				currentKey = currentKey..string.char(math.random(127))
+			task.wait(0.1)
+			currentKey = "_."
+			for _ = 1, Chars do
+				currentKey = currentKey .. string.char(math.random(127))
 			end
 		until not moduleConfig.used[currentKey]
 		table.insert(moduleConfig.used, currentKey)

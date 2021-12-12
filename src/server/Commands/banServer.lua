@@ -2,8 +2,8 @@ local ServerStorage = game:GetService("ServerStorage")
 local Players = game:GetService("Players")
 local Messaging = game:GetService("MessagingService")
 
-local BanService = require(ServerStorage.Modules.Storage.BanService)
-local Admins = require(ServerStorage.Modules.Storage.Admins)
+local BanService = require(ServerStorage.Storage.Modules.BanService)
+local Admins = require(ServerStorage.Storage.Modules.Admins)
 
 return function (Context, Victim, Reason)
 	if not Reason then return "Reason required." end

@@ -71,7 +71,7 @@ end
 --[=[
     Uses the Promise library to wait for a child to receive a new parent.
 	If a parent is provided, this function will only return a result if the new parent matches such.
-    If after the timeout (in seconds), there is still no valid child, this function will cancel and resolve.
+    If after the timeout (in seconds), there is still no valid parent, this function will cancel and resolve.
 
     @param Object Instance -- The object to receive a new parent
     @param Timeout Number -- The timeout, in seconds, of this function to automatically resolve

@@ -1,11 +1,18 @@
-local playerService = game:GetService("Players")
-local repStorage = game:GetService("ReplicatedStorage")
-local Player = playerService.LocalPlayer
-local PlayerGui = Player.PlayerGui
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Event = repStorage.Events:FindFirstChild("CmdrHintBoundary")
+local Player = Players.LocalPlayer
 
-local HintGui = PlayerGui:WaitForChild("Hint")
+local Gui = Player.PlayerGui
+if not Gui then 
+	repeat 
+		task.wait() 
+	until Gui ~= nil 
+end
+
+local Event = ReplicatedStorage.Events:FindFirstChild("Cmdr-Connection")
+
+local HintGui = Gui:WaitForChild("Hint")
 local ClipFrame = HintGui:WaitForChild("Clip")
 local ValueText = ClipFrame:WaitForChild("Value")
 
@@ -18,15 +25,14 @@ local Hints = {
 	"<b>Next Saturday</b> is a streetwear clothing group, offering (primarily) mens and womens clothing!",
 	"Have a bug report? Please contact <b>astroxics</b> or <b>Aerosphia</b> with relevant details.",
 }
-
 local Clearing = {}
 
-local activeTime = 7.5 -- How long the tip will be when active (displayed) until being hidden
-local inactiveTime = 60 -- How long between each new randomized tip
+local activeTime = 7.5
+local inactiveTime = 60
 
 local automatic = true
 
-function Hint(Text,Perm)
+function Hint(Text, Permanent)
 	if ClipFrame.Position ~= UDim2.new(0,0,-0.5,0) then
 		ClipFrame.Position = UDim2.new(0,0,-0.5,0)
 	end
@@ -34,8 +40,8 @@ function Hint(Text,Perm)
 	ClipFrame.Visible = true
 	ClipFrame:TweenPosition(UDim2.new(0,0,0,0),'Out','Quint',1,false,function()
 		if Enum.TweenStatus.Completed then
-			if not Perm then
-				task.delay(activeTime,function()
+			if not Permanent then
+				task.delay(activeTime, function()
 					if automatic then
 						ClipFrame:TweenPosition(UDim2.new(0,0,-0.5,0),'Out','Quint',1)
 					end
@@ -70,20 +76,19 @@ Event.OnClientEvent:Connect(function(Starter,...)
 end)
 
 task.spawn(function()
-	while wait(inactiveTime) do
+	while task.wait(inactiveTime) do
 		if automatic then
 			if #Hints == 0 then
-				for a,b in pairs(Clearing) do
+				for _, b in pairs(Clearing) do
 					table.insert(Hints,b)
 				end
 			end
-			local Ran = math.random(1,#Hints)
-			local Chosen = Hints[Ran]
-			Hint(Chosen,false)
+			local Chosen = Hints[math.random(1, #Hints)]
+			Hint(Chosen, false)
 			for a,b in pairs(Hints) do
 				if b == Chosen then
-					table.insert(Clearing,b)
-					table.remove(Hints,a)
+					table.insert(Clearing, b)
+					table.remove(Hints, a)
 				end
 			end
 		end

@@ -1,12 +1,12 @@
 local PhysService = game:GetService("PhysicsService")
 
-PhysService:CreateCollisionGroup('p')
-PhysService:CollisionGroupSetCollidable('p','p',false)
+PhysService:CreateCollisionGroup("p")
+PhysService:CollisionGroupSetCollidable("p", "p", false)
 
 function NoCollide(model)
 	for _, b in next, model:GetChildren() do
-		if b:IsA"BasePart" then
-			PhysService:SetPartCollisionGroup(b,"p")
+		if b:IsA("BasePart") then
+			PhysService:SetPartCollisionGroup(b, "p")
 		end
 	end
 end
@@ -19,7 +19,7 @@ game.Players.PlayerAdded:Connect(function(Player)
 		task.wait(0.1)
 		NoCollide(Character)
 	end)
-	
+
 	if Player.Character then
 		NoCollide(Player.Character)
 	end

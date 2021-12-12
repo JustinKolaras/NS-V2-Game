@@ -3,9 +3,9 @@ local isLocked, lockReason, contextExecutor = false, "", nil
 
 function LockModule:Lock(reason, executor)
 	if isLocked and #lockReason > 0 then
-		return "Already locked: "..lockReason.." ("..tostring(contextExecutor)..")"
+		return "Already locked: " .. lockReason .. " (" .. tostring(contextExecutor) .. ")"
 	elseif isLocked then
-		return "Already locked. ("..tostring(contextExecutor)..")"
+		return "Already locked. (" .. tostring(contextExecutor) .. ")"
 	end
 	isLocked = true
 	lockReason = reason or ""

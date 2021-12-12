@@ -6,8 +6,7 @@ local Player = Players.LocalPlayer
 
 Cmdr:SetEnabled(false)
 
-if Player:GetRankInGroup(8046949) >= 252 or Player.UserId == tonumber('-1') then
+if Player:GetRankInGroup(8046949) >= 252 or Player.UserId == tonumber("-1") then
 	Cmdr:SetEnabled(true)
 	Cmdr:SetActivationKeys({ Enum.KeyCode.Semicolon })
 end
-

@@ -12,11 +12,9 @@ local function cmdrPermission()
 end
 
 if cmdrPermission() and UserInput.TouchEnabled then
-	
-	local cmdrIcon = Icon.new():setLabel('Cmdr'):setCornerRadius(0, 4):setTip("Open Cmdr Window")
-	
+	local cmdrIcon = Icon.new():setLabel("Cmdr"):setCornerRadius(0, 4):setTip("Open Cmdr Window")
+
 	cmdrIcon.selected:Connect(function()
 		Cmdr:Toggle()
 	end)
-	
 end
