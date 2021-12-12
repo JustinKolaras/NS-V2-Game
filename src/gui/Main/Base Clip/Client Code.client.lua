@@ -2,7 +2,6 @@ local Players = game:GetService("Players")
 local Market = game:GetService("MarketplaceService")
 
 local Player = Players.LocalPlayer
-local Character = Player.Character or Player.CharacterAdded:Wait()
 local PlayerGui = Player.PlayerGui
 if not PlayerGui then
 	repeat
@@ -121,7 +120,7 @@ local CreditsCanvas = Credits.Canvas
 
 CreditsControlsX.MouseButton1Click:Connect(function()
 	repeat
-		wait()
+		task.wait()
 	until Credits.Position == UDim2.new(0.5, 0, 0.5, 0)
 	CreditsCanvas.CanvasPosition = Vector2.new(0, 0)
 	TweenTwoSubsequently(
@@ -187,7 +186,7 @@ end)
 
 DonateControlsX.MouseButton1Click:Connect(function()
 	repeat
-		wait()
+		task.wait()
 	until Donate.Position == UDim2.new(0.5, 0, 0.5, 0)
 	TweenTwoSubsequently(
 		Donate,

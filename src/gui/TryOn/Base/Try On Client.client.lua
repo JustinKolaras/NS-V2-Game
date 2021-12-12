@@ -135,7 +135,7 @@ end
 
 function core.elements(Toggle)
 	local ok, _, timeout = nil, nil, 0
-	assert(typeof(Toggle) == "boolean")
+	assert(typeof(Toggle) == "boolean", "Toggle is not a boolean!")
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, Toggle)
 	local function ResetButtonCallback()
 		StarterGui:SetCore("ResetButtonCallback", Toggle)
@@ -190,7 +190,7 @@ local function checkAsset(Proto, ...)
 end
 
 local function productInfo(id, enum)
-	assert(enum.EnumType == Enum.InfoType)
+	assert(enum.EnumType == Enum.InfoType, "productInfo: enum.EnumType is not Info")
 	return Promise.new(function(resolve, reject)
 		local succ, result = pcall(Market.GetProductInfo, Market, id, enum)
 		return succ and resolve(result) or reject(result)
@@ -289,7 +289,7 @@ end
 
 local function disconnect(Client)
 	if Client.UserId == Player.UserId then
-		for a, b in next, clientConfig._connections do
+		for _, b in next, clientConfig._connections do
 			pcall(b.Disconnect, b)
 			b = nil
 		end
@@ -627,7 +627,7 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 	end
 end)
 
-Function.OnClientInvoke = function(Key, ...)
+Function.OnClientInvoke = function(Key)
 	if Key == "MouseTarget" then
 		return Player:GetMouse().Target
 	end
