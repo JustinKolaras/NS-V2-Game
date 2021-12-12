@@ -13,16 +13,16 @@ local Promise = require(ReplicatedStorage.Shared.Promise)
 function util:FindAbsoluteAncestor(Ancestor, Current)
 	local toReturn
 	repeat
-		if toReturn and toReturn.Parent == nil then 
-			return nil 
+		if toReturn and toReturn.Parent == nil then
+			return nil
 		end
 		if Current then
 			toReturn = Current.Parent
 		elseif toReturn then
 			toReturn = toReturn.Parent
 		end
-		if Current then 
-			Current = nil 
+		if Current then
+			Current = nil
 		end
 	until (toReturn.Name == Ancestor.Name) and (toReturn.ClassName == Ancestor.ClassName)
 	return toReturn
@@ -39,7 +39,7 @@ end
 ]=]
 function util:WaitForChildOfClass(Parent, Class, Timeout)
 	return Promise.new(function(resolve)
-		local temp 
+		local temp
 		local disregard
 		if Parent:FindFirstChildOfClass(Class) then
 			disregard = true
@@ -55,9 +55,9 @@ function util:WaitForChildOfClass(Parent, Class, Timeout)
 				end
 			end)
 			Promise.delay(Timeout):andThen(function()
-				if not disregard then 
+				if not disregard then
 					warn(("Timeout reached on:\n%s waiting for %s"):format(tostring(Parent), Class))
-					if (temp) and (temp.Connected) then
+					if temp and temp.Connected then
 						temp:Disconnect()
 						temp = nil
 						resolve()
@@ -88,7 +88,7 @@ function util:WaitForNewParent(Object, Timeout, Parent)
 		end
 		if not disregard then
 			temp = Object:GetPropertyChangedSignal("Parent"):Connect(function(it)
-				if (Parent and it == Parent) or (not Parent) then
+				if (Parent and it == Parent) or not Parent then
 					disregard = true
 					temp:Disconnect()
 					temp = nil
@@ -96,9 +96,9 @@ function util:WaitForNewParent(Object, Timeout, Parent)
 				end
 			end)
 			Promise.delay(Timeout):andThen(function()
-				if not disregard then 
+				if not disregard then
 					warn(("Timeout reached on:\n%s waiting for a new parent"):format(tostring(Object)))
-					if (temp) and (temp.Connected) then
+					if temp and temp.Connected then
 						temp:Disconnect()
 						temp = nil
 						resolve()
@@ -119,7 +119,7 @@ end
 function util:Create(Object, Properties)
 	local toReturn = Instance.new(Object)
 	if Properties then
-		for a,b in next,Properties do
+		for a, b in next, Properties do
 			toReturn[a] = b
 		end
 	end
@@ -136,7 +136,7 @@ end
 function util:Clone(Object, Properties)
 	local toReturn = Object:Clone()
 	if Properties then
-		for a,b in next,Properties do
+		for a, b in next, Properties do
 			toReturn[a] = b
 		end
 	end
@@ -153,7 +153,7 @@ end
     @return void
 ]=]
 function util:MoveChildren(Previous, Next, shouldDelete)
-	for _, b in next,Previous:GetChildren() do
+	for _, b in next, Previous:GetChildren() do
 		b.Parent = Next
 	end
 	if shouldDelete then
