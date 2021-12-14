@@ -44,6 +44,10 @@ local Exit = AdvView.Exit
 local AdvTriggFrame = ScreenGui.AV_Trigger
 local AdvTrigger = AdvTriggFrame.Trigger
 
+local Notice = ScreenGui.Notice
+local NoticeCloseButton = Notice.X
+local NoticeDesc = Notice.Desc
+
 local TryOnFolder = ReplicatedStorage:FindFirstChild("TryOn")
 
 local Event = TryOnFolder:FindFirstChild("TryOn Event")
@@ -72,6 +76,9 @@ local clientConfig = {
 			speedInputTPCS = nil,
 			exit = nil,
 		},
+		notice = {
+			close = nil,
+		},
 		died = nil,
 		clientEvent = nil,
 	},
@@ -99,6 +106,7 @@ local clientConfig = {
 	isTryingOn = false,
 	loadText = Loading.Text,
 	loadErrorText = "Unknown error",
+	noticeExecErrorText = "Please join our Discord server with this screenshot as a bug report. This usually has something to do with your avatar - try removing packages!",
 	loadingTimes = {},
 	archivedLoads = {},
 }
@@ -253,22 +261,27 @@ local function cancelLoading()
 	loadPromise = nil
 end
 
-local function close(t)
-	local vpChar = clientConfig.storedViewport
-	cancelLoading()
-	Base.Visible = false
-	ErrorNotif.Visible = false
-	if not t or t == 0 then
-		AdvTriggFrame.Visible = false
+local function close(Key, Type)
+	if Key == "Base" then
+		local vpChar = clientConfig.storedViewport
+		cancelLoading()
+		Base.Visible = false
+		ErrorNotif.Visible = false
+		if not Type or Type == 0 then
+			AdvTriggFrame.Visible = false
+		end
+		ManType.Text = "2D"
+		clientConfig.connectionBreak3d = true
+		pcall(function()
+			vpChar.PrimaryPart = vpChar:FindFirstChild("HumanoidRootPart")
+			vpChar:SetPrimaryPartCFrame(clientConfig.originalCFrame3d)
+		end)
+		task.wait(1 / 60)
+		clientConfig.connectionBreak3d = false
+	elseif Key == "Notice" then
+		Notice.Visible = false
+		NoticeDesc.Text = ""
 	end
-	ManType.Text = "2D"
-	clientConfig.connectionBreak3d = true
-	pcall(function()
-		vpChar.PrimaryPart = vpChar:FindFirstChild("HumanoidRootPart")
-		vpChar:SetPrimaryPartCFrame(clientConfig.originalCFrame3d)
-	end)
-	task.wait(1 / 60)
-	clientConfig.connectionBreak3d = false
 end
 
 local function err(info, text)
@@ -330,6 +343,25 @@ function createViewport(templates)
 	end)
 end
 
+function noticeConnectionUnit()
+	for _, b in next, clientConfig._connections.notice do
+		b:Disconnect()
+		b = nil
+	end
+	return Promise.new(function(resolve)
+		clientConfig._connections.notice.close = NoticeCloseButton.MouseButton1Click:Connect(function()
+			close("Notice")
+		end)
+		resolve()
+	end)
+end
+
+local function newNotice(noticeText)
+	noticeConnectionUnit():await()
+	NoticeDesc.Text = noticeText
+	Notice.Visible = true
+end
+
 function advConnectionUnit()
 	for _, b in next, clientConfig._connections.advancedView do
 		b:Disconnect()
@@ -383,7 +415,7 @@ function advConnectionUnit()
 				AdvTrigger.AutoButtonColor = true
 			end)
 
-			close(1)
+			close("Base", 1)
 		end
 		clientConfig._connections.advancedView.exit = Exit.MouseButton1Click:Connect(clientConfig.advExFunc)
 		resolve()
@@ -396,14 +428,16 @@ function mainConnectionUnit(shirtObject, pantObject)
 		b = nil
 	end
 	return Promise.new(function(resolve)
-		clientConfig._connections.terminal.close = CloseButton.MouseButton1Click:Connect(close)
+		clientConfig._connections.terminal.close = CloseButton.MouseButton1Click:Connect(function()
+			close("Base")
+		end)
 		clientConfig._connections.terminal.tryOn = TryOn.MouseButton1Click:Connect(function()
 			if TryOn.Text == "Try On Outfit" then
 				tryOn(clientConfig.globalTemplates.TemplateS, clientConfig.globalTemplates.TemplateP)
-				close(1)
+				close("Base", 1)
 			elseif TryOn.Text == "Take Off Outfit" then
 				takeOff()
-				close()
+				close("Base")
 			end
 		end)
 		clientConfig._connections.terminal.buyS = BuyShirt.MouseButton1Click:Connect(function()
@@ -499,7 +533,7 @@ function mainConnectionUnit(shirtObject, pantObject)
 
 			AdvTriggFrame.Visible = false
 			AdvView.Visible = true
-			close()
+			close("Base")
 
 			local Character = Player.Character
 
@@ -527,7 +561,7 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 	local Data = { ... }
 	if Key == "Open" then
 		clientConfig._promise.mainLoad = Promise.new(function(_, _, onCancel)
-			if Base.Visible or clientConfig.isAdvancedView then
+			if Base.Visible or Notice.Visible or clientConfig.isAdvancedView then
 				return
 			end
 			local shirt, pant = Data[1], Data[2]
@@ -618,7 +652,7 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 
 			print(("Took " .. Time.Get() .. " seconds to load on client %s!"):format(Player.Name))
 		end):catch(function(errorMsg)
-			return err(errorMsg)
+			return Base.Visible and err(errorMsg) or newNotice(clientConfig.noticeExecErrorText)
 		end)
 	elseif Key == "Config" then
 		clientConfig.key = Data[1]
@@ -635,7 +669,7 @@ Util:WaitForChildOfClass(Player.Character, "Humanoid", 2):andThen(function(resul
 	if result then
 		clientConfig._connections.died = result.Died:Connect(function()
 			if Base.Visible then
-				close(1)
+				close("Base", 1)
 			end
 			if clientConfig.isTryingOn then
 				takeOff()
