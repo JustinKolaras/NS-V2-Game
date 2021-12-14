@@ -106,7 +106,7 @@ function Maid:givePromise(promise)
 end--]]
 
 function Maid:give(taskOrPromise)
-	local taskId
+	local taskId, _
 	if type(taskOrPromise) == "table" and taskOrPromise.isAPromise then
 		_, taskId = self:givePromise(taskOrPromise)
 	else
