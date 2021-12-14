@@ -6,7 +6,7 @@ local Player = playerService.LocalPlayer
 local Character = Player.Character or Player.CharacterAdded:Wait()
 local CharacterHumanoid = Character:WaitForChild("Humanoid")
 local PlayerGui = Player.PlayerGui
-wait()
+task.wait(1 / 60)
 
 local IntroGui = PlayerGui:WaitForChild("Intro")
 local TweenBgr = IntroGui:WaitForChild("TweenBackground")
@@ -16,34 +16,34 @@ local Skip = TweenBgr:WaitForChild("Skip Button")
 
 function Setup()
 	IntroGui.Enabled = true
-	TweenBgr.Position = UDim2.new(0,0,-1,0)
+	TweenBgr.Position = UDim2.new(0, 0, -1, 0)
 	TweenBgr.Visible = false
-	Skip.Position = UDim2.new(-0.1,0,0.938,0)
+	Skip.Position = UDim2.new(-0.1, 0, 0.938, 0)
 	Skip.Visible = false
 	Title.TextTransparency = 1
-	Desc.TextTransparency = 1	
+	Desc.TextTransparency = 1
 end
 
 function DoIt()
 	TweenBgr.Visible = true
-	TweenBgr:TweenPosition(UDim2.new(0,0,0,0),'Out','Quart',2,false,function()
+	TweenBgr:TweenPosition(UDim2.new(0, 0, 0, 0), "Out", "Quart", 2, false, function()
 		if Enum.TweenStatus.Completed then
-			delay(1, function()
+			task.delay(1, function()
 				Skip.Visible = true
-				Skip:TweenPosition(UDim2.new(0.013,0,0.938,0),'Out','Quart',1)
+				Skip:TweenPosition(UDim2.new(0.013, 0, 0.938, 0), "Out", "Quart", 1)
 				repeat
-					Title.TextTransparency -= .1
-					wait(.1)
+					Title.TextTransparency -= 0.1
+					task.wait(0.1)
 				until Title.TextTransparency <= 0
-				delay(1, function()
+				task.delay(1, function()
 					repeat
-						Desc.TextTransparency -= .1
-						wait(.1)
+						Desc.TextTransparency -= 0.1
+						task.wait(0.1)
 					until Desc.TextTransparency <= 0
-					delay(3, function()
+					task.delay(3, function()
 						CharacterHumanoid.WalkSpeed = 16
-						Skip:TweenPosition(UDim2.new(-0.1,0,0.938,0),'Out','Quart',.5)
-						TweenBgr:TweenPosition(UDim2.new(0,0,-1,0),'Out','Quart',.5,false,function()
+						Skip:TweenPosition(UDim2.new(-0.1, 0, 0.938, 0), "Out", "Quart", 0.5)
+						TweenBgr:TweenPosition(UDim2.new(0, 0, -1, 0), "Out", "Quart", 0.5, false, function()
 							if Enum.TweenStatus.Completed then
 								Setup()
 							end
@@ -57,8 +57,8 @@ end
 
 Skip.MouseButton1Click:Connect(function()
 	CharacterHumanoid.WalkSpeed = 16
-	Skip:TweenPosition(UDim2.new(-0.1,0,0.938,0),'Out','Quart',.5)
-	TweenBgr:TweenPosition(UDim2.new(0,0,-1,0),'Out','Quart',1,false,function()
+	Skip:TweenPosition(UDim2.new(-0.1, 0, 0.938, 0), "Out", "Quart", 0.5)
+	TweenBgr:TweenPosition(UDim2.new(0, 0, -1, 0), "Out", "Quart", 1, false, function()
 		if Enum.TweenStatus.Completed then
 			Setup()
 		end
@@ -68,5 +68,5 @@ end)
 if not runService:IsStudio() then
 	CharacterHumanoid.WalkSpeed = 0
 	Setup()
-	DoIt()	
+	DoIt()
 end

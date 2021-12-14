@@ -4,10 +4,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Player = Players.LocalPlayer
 
 local Gui = Player.PlayerGui
-if not Gui then 
-	repeat 
-		task.wait() 
-	until Gui ~= nil 
+if not Gui then
+	repeat
+		task.wait()
+	until Gui ~= nil
 end
 
 local Event = ReplicatedStorage.Events:FindFirstChild("Cmdr-Connection")
@@ -20,7 +20,7 @@ local Hints = {
 	"Join the <b>group</b> for more updates, clothing, and rank ups!",
 	"Communications server code: <b>SHRuvXcpMc</b>",
 	"Want a shirt/pants designed to your liking? Comment your requests on the <b>group wall</b>!",
-	'To open clothing interaction menus, hold out your <b>Shopping Bag</b> and click on any mannequin.',
+	"To open clothing interaction menus, hold out your <b>Shopping Bag</b> and click on any mannequin.",
 	"Most designs were made by astroxics and the rest of the designers! This game was scripted by Aerosphia.",
 	"<b>Next Saturday</b> is a streetwear clothing group, offering (primarily) mens and womens clothing!",
 	"Have a bug report? Please contact <b>astroxics</b> or <b>Aerosphia</b> with relevant details.",
@@ -33,17 +33,17 @@ local inactiveTime = 60
 local automatic = true
 
 function Hint(Text, Permanent)
-	if ClipFrame.Position ~= UDim2.new(0,0,-0.5,0) then
-		ClipFrame.Position = UDim2.new(0,0,-0.5,0)
+	if ClipFrame.Position ~= UDim2.new(0, 0, -0.5, 0) then
+		ClipFrame.Position = UDim2.new(0, 0, -0.5, 0)
 	end
 	ValueText.Text = tostring(Text)
 	ClipFrame.Visible = true
-	ClipFrame:TweenPosition(UDim2.new(0,0,0,0),'Out','Quint',1,false,function()
+	ClipFrame:TweenPosition(UDim2.new(0, 0, 0, 0), "Out", "Quint", 1, false, function()
 		if Enum.TweenStatus.Completed then
 			if not Permanent then
 				task.delay(activeTime, function()
 					if automatic then
-						ClipFrame:TweenPosition(UDim2.new(0,0,-0.5,0),'Out','Quint',1)
+						ClipFrame:TweenPosition(UDim2.new(0, 0, -0.5, 0), "Out", "Quint", 1)
 					end
 				end)
 			end
@@ -51,24 +51,24 @@ function Hint(Text, Permanent)
 	end)
 end
 
-Event.OnClientEvent:Connect(function(Starter,...)
-	local Data = {...}
+Event.OnClientEvent:Connect(function(Starter, ...)
+	local Data = { ... }
 	if Starter == "Activate" then
 		local Text = Data[1]
-		if ClipFrame.Position ~= UDim2.new(0,0,-0.5,0) then
-			ClipFrame:TweenPosition(UDim2.new(0,0,-0.5,0),'Out','Quint',1,false,function()
+		if ClipFrame.Position ~= UDim2.new(0, 0, -0.5, 0) then
+			ClipFrame:TweenPosition(UDim2.new(0, 0, -0.5, 0), "Out", "Quint", 1, false, function()
 				automatic = false
-				task.wait(.1)
-				Hint(Text,true)
+				task.wait(0.1)
+				Hint(Text, true)
 			end)
 		else
 			automatic = false
-			task.wait(.1)
-			Hint(Text,true)
+			task.wait(0.1)
+			Hint(Text, true)
 		end
 	elseif Starter == "Deactivate" then
 		if not automatic then
-			ClipFrame:TweenPosition(UDim2.new(0,0,-0.5,0),'Out','Quint',1,false,function()
+			ClipFrame:TweenPosition(UDim2.new(0, 0, -0.5, 0), "Out", "Quint", 1, false, function()
 				automatic = true
 			end)
 		end
@@ -80,12 +80,12 @@ task.spawn(function()
 		if automatic then
 			if #Hints == 0 then
 				for _, b in pairs(Clearing) do
-					table.insert(Hints,b)
+					table.insert(Hints, b)
 				end
 			end
 			local Chosen = Hints[math.random(1, #Hints)]
 			Hint(Chosen, false)
-			for a,b in pairs(Hints) do
+			for a, b in pairs(Hints) do
 				if b == Chosen then
 					table.insert(Clearing, b)
 					table.remove(Hints, a)
