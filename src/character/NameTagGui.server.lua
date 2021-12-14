@@ -4,13 +4,13 @@ local Market = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Util = require(ReplicatedStorage.Shared.Util)
+
 local Character = script.Parent.Parent
 local Player = Players:GetPlayerFromCharacter(Character)
 
-local NameTag = script:FindFirstChild("NameTag")
+local NameTag = script:WaitForChild("NameTag")
 NameTag.Enabled = false
-
-local Util = require(ReplicatedStorage.Shared.Util)
 
 local UserString, RankString = Util:Create("StringValue"), Util:Create("StringValue")
 UserString.Name = "Username"

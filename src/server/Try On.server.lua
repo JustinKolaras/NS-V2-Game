@@ -18,7 +18,7 @@ local Folder = workspace.Mannequins
 local Tool = ReplicatedStorage.TryOn["Shopping Bag"]
 
 local Util = require(ReplicatedStorage.Shared.Util)
-local Key = require(ServerStorage.Modules.Key)
+local Key = require(ServerStorage.Storage.Modules.Key)
 
 local serverConfig = {
 	Keys = {},
