@@ -41,7 +41,7 @@
 
         "StarterGui": {
             "$className": "StarterGui",
-            "$path": "src/gui"
+            "$path": "src/user_interface"
         },
 
         "Workspace": {
