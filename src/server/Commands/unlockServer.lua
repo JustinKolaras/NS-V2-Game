@@ -1,9 +1,13 @@
 local ServerStorage = game:GetService("ServerStorage")
 
-local lockMod = require(ServerStorage.Modules.Lock)
+local LockModule = require(ServerStorage.Storage.Modules.Lock)
 
-return function (Context)
-	local errorMsg = lockMod:Unlock()
-	if errorMsg then return errorMsg end
+return function()
+	local errorMsg = LockModule:Unlock()
+
+	if errorMsg then
+		return tostring(errorMsg)
+	end
+
 	return "Unlocked server."
 end

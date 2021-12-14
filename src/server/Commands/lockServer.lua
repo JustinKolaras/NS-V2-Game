@@ -1,18 +1,16 @@
 local ServerStorage = game:GetService("ServerStorage")
 
-local lockMod = require(ServerStorage.Modules.Lock)
+local LockModule = require(ServerStorage.Storage.Modules.Lock)
 
-return function (Context, lockReason)
-	-- See if the Reason is above the character limit.
-	if lockReason:len() > 100 then
+return function(Context, lockReason)
+	if #lockReason > 100 then
 		return "Reason too long."
 	end
-	
-	local errorMsg = lockMod:Lock(lockReason, Context.Executor)
-	if errorMsg then return errorMsg end
-	if lockReason then
-		return "Locked server: "..lockReason
-	else
-		return "Locked server."
+
+	local errorMsg = LockModule:Lock(lockReason, Context.Executor)
+	if errorMsg then
+		return tostring(errorMsg)
 	end
+
+	return lockReason and "Locked server: " .. lockReason or "Locked server, no reason provided."
 end

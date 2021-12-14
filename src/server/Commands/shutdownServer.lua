@@ -1,12 +1,9 @@
 local Players = game:GetService("Players")
-local Http = game:GetService("HttpService")
 
-return function (Context)
-	
+return function(Context)
 	local Executor = Context.Executor
-	
-	for a,b in next,Players:GetPlayers() do
-		b:Kick( ("Server shutdown by %s!"):format(Context.Executor.Name) )
+
+	for _, b in next, Players:GetPlayers() do
+		b:Kick(("Server shutdown by %s!"):format(Executor.Name))
 	end
-	
 end
