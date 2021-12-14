@@ -105,7 +105,7 @@ end)
 
 BaseControlsX.MouseButton1Click:Connect(function()
 	repeat
-		wait()
+		task.wait()
 	until Base.Position == UDim2.new(0.5, 0, 0.5, 0)
 	TweenTrigger(2)
 	TweenFrame(Base, UDim2.new(0.5, 0, 0.5, 0), UDim2.new(1.5, 0, 0.5, 0), false, function()

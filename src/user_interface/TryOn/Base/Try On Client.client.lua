@@ -339,15 +339,15 @@ function advConnectionUnit()
 		clientConfig._connections.advancedView.speedInputTPCS = SpeedInput
 			:GetPropertyChangedSignal("Text")
 			:Connect(function()
-				local function sub()
+				local function subtract()
 					SpeedInput.Text = SpeedInput.Text:sub(0, -2)
 				end
 				if #SpeedInput.Text > 1 then
-					return sub()
+					return subtract()
 				elseif not tonumber(SpeedInput.Text) then
-					return sub()
+					return subtract()
 				elseif tonumber(SpeedInput.Text) > 5 then
-					return sub()
+					return subtract()
 				end
 			end)
 		clientConfig._connections.advancedView.speedInputFocusLost = SpeedInput.FocusLost:Connect(function()
@@ -396,9 +396,7 @@ function mainConnectionUnit(shirtObject, pantObject)
 		b = nil
 	end
 	return Promise.new(function(resolve)
-		clientConfig._connections.terminal.close = CloseButton.MouseButton1Click:Connect(function()
-			close()
-		end)
+		clientConfig._connections.terminal.close = CloseButton.MouseButton1Click:Connect(close)
 		clientConfig._connections.terminal.tryOn = TryOn.MouseButton1Click:Connect(function()
 			if TryOn.Text == "Try On Outfit" then
 				tryOn(clientConfig.globalTemplates.TemplateS, clientConfig.globalTemplates.TemplateP)
@@ -574,7 +572,7 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 
 			-- This is so we can retrieve the template objects in other functions
 			-- without having to pass them (specifically the Try On button functionality).
-			-- I could just pass them, but I'd rather this method.
+			-- I'd rather this method over others.
 			clientConfig.globalTemplates.TemplateS = templateTable.TemplateS
 			clientConfig.globalTemplates.TemplateP = templateTable.TemplateP
 
