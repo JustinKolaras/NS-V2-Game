@@ -303,6 +303,9 @@ end
 local function disconnect(Client)
 	if Client.UserId == Player.UserId then
 		for _, b in next, clientConfig._connections do
+			unpack(b)
+		end
+		for _, b in next, clientConfig._connections do
 			pcall(b.Disconnect, b)
 			b = nil
 		end
