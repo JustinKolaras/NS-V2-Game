@@ -121,9 +121,8 @@ end
 
 function Time.Get()
 	local toReturn = tostring(os.clock() - clientConfig.loadingTimes[1])
-	toReturn = (#tostring(clientConfig.loadingTimes[1]) < 3)
-			and toReturn:sub(1, #tostring(clientConfig.loadingTimes[1]))
-		or toReturn:sub(1, 3)
+	toReturn = (#tostring(clientConfig.loadingTimes[1]) < 3) 
+		and toReturn:sub(1, #tostring(clientConfig.loadingTimes[1])) or toReturn:sub(1, 3)
 
 	table.move(clientConfig.loadingTimes, 1, 1, #clientConfig.archivedLoads, clientConfig.archivedLoads)
 
@@ -302,12 +301,16 @@ end
 
 local function disconnect(Client)
 	if Client.UserId == Player.UserId then
-		for _, b in next, clientConfig._connections do
-			unpack(b)
-		end
-		for _, b in next, clientConfig._connections do
-			pcall(b.Disconnect, b)
-			b = nil
+		for _, outermost in next, clientConfig._connections do
+			if typeof(outermost) == "table" then -- Not expecting to next multiple tables, so we'll loop here
+				for _, innermost in next, outermost do
+					pcall(innermost.Disconnect, innermost)
+					innermost = nil
+				end
+			else
+				pcall(outermost.Disconnect, outermost)
+				outermost = nil
+			end
 		end
 	end
 end
