@@ -86,7 +86,9 @@ end
 Event.OnServerEvent:Connect(function(Player, ClientKey, Starter, ...)
 	local Data = { ... }
 	if serverConfig.Keys[Player.UserId] == ClientKey then
+		print("Inside boundaries")
 		if Starter == "TryOn" then
+			print("Inside boundaries 2")
 			local Character = Player.Character
 			local cShirt, cPants = Character.Shirt, Character.Pants
 			local s, p = Data[1], Data[2]
@@ -95,6 +97,7 @@ Event.OnServerEvent:Connect(function(Player, ClientKey, Starter, ...)
 			serverConfig.originalClothes[Player.Name]["Pants"] = cPants.PantsTemplate:match("%d+")
 			cShirt.ShirtTemplate = serverConfig.templatePrefix:format(s)
 			cPants.PantsTemplate = serverConfig.templatePrefix:format(p)
+			print("Done")
 		elseif Starter == "TakeOff" then
 			local Character = Player.Character
 			local cShirt, cPants = Character.Shirt, Character.Pants

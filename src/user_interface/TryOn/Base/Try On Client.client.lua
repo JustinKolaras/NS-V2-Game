@@ -121,10 +121,10 @@ end
 
 function Time.Get()
 	local toReturn = tostring(os.clock() - clientConfig.loadingTimes[1])
-	toReturn = (#tostring(clientConfig.loadingTimes[1]) < 3) 
+	toReturn = (#tostring(clientConfig.loadingTimes[1]) < 3)
 		and toReturn:sub(1, #tostring(clientConfig.loadingTimes[1])) or toReturn:sub(1, 3)
 
-	table.move(clientConfig.loadingTimes, 1, 1, #clientConfig.archivedLoads, clientConfig.archivedLoads)
+	table.move(clientConfig.loadingTimes, 1, 1, select("#", clientConfig.archivedLoads), clientConfig.archivedLoads)
 
 	return tonumber(toReturn)
 end
@@ -157,6 +157,7 @@ function core.elements(Toggle)
 end
 
 local function fireServer(...)
+	print("in fireServer")
 	Event:FireServer(clientConfig.key, ...)
 end
 
@@ -552,12 +553,10 @@ function mainConnectionUnit(shirtObject, pantObject)
 			local offsetCFrame = CFrame.new(0, 0, 10) * CFrame.Angles(math.rad(-22.5), 0, 0)
 			local currentAngle = 0
 
-			local function rotateCamera()
+			RunService:BindToRenderStep("CameraRotation", Enum.RenderPriority.Camera.Value + 1, function()
 				Camera.CFrame = centerCFrame * CFrame.Angles(0, math.rad(currentAngle), 0) * offsetCFrame
 				currentAngle += clientConfig.advSpeed
-			end
-
-			RunService:BindToRenderStep("CameraRotation", Enum.RenderPriority.Camera.Value + 1, rotateCamera)
+			end)
 		end)
 		resolve()
 	end)
