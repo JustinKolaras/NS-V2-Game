@@ -3,7 +3,6 @@ return {
 	2606923587, -- NSGroupOwner: Holder
 	28872421, -- astroxics: Owner
 	-- 340615815, -- Aerosphia: Co-Owner
-	56415482, -- Sybilene: Co-Owner
 
 	--
 
