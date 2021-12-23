@@ -157,7 +157,6 @@ function core.elements(Toggle)
 end
 
 local function fireServer(...)
-	print("in fireServer")
 	Event:FireServer(clientConfig.key, ...)
 end
 
