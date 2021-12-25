@@ -84,14 +84,13 @@ end
 function banService:Add(Id, Executor, Reason)
 	local _, Err = pcall(BanStore.SetAsync, BanStore, Settings.storeKey .. Id, { true, Executor, Reason })
 	if Err then
-		local err
-		retry.Set(nil, BanStore, Settings.storeKey .. Id, 5, { true, Executor, Reason })
+		retry.Set(BanStore, Settings.storeKey .. Id, 5, { true, Executor, Reason })
 			:catch(function(errorMsg)
-				err = errorMsg
+				Err = errorMsg
 			end)
 			:await()
-		if err then
-			return "Error: " .. err
+		if Err then
+			return "Error: " .. tostring(Err)
 		end
 	end
 end
@@ -99,14 +98,13 @@ end
 function banService:Remove(Id)
 	local _, Err = pcall(BanStore.RemoveAsync, BanStore, Settings.storeKey .. Id)
 	if Err then
-		local err
-		retry.Remove(nil, BanStore, Settings.storeKey .. Id, 5)
+		retry.Remove(BanStore, Settings.storeKey .. Id, 5)
 			:catch(function(errorMsg)
-				err = errorMsg
+				Err = errorMsg
 			end)
 			:await()
-		if err then
-			return "Error: " .. err
+		if Err then
+			return "Error: " .. tostring(Err)
 		end
 	end
 end
@@ -122,16 +120,15 @@ function banService:GetBanInfo(Id)
 	end)
 
 	if Err then
-		local err
-		retry.Get(nil, BanStore, Settings.storeKey .. Id, 5)
+		retry.Get(BanStore, Settings.storeKey .. Id, 5)
 			:andThen(function(result)
 				isBanned, executorId, banReason = unpack(result)
 			end)
 			:catch(function(errorMsg)
-				err = errorMsg
+				Err = errorMsg
 			end)
-		if err then
-			return "Error: " .. err
+		if Err then
+			return "Error: " .. tostring(Err)
 		end
 	end
 

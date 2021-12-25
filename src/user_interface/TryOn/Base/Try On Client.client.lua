@@ -142,7 +142,7 @@ end
 
 function core.elements(Toggle)
 	local ok, _, timeout = nil, nil, 0
-	assert(typeof(Toggle) == "boolean", "Toggle is not a boolean!")
+	assert(typeof(Toggle) == "boolean", "core.elements: Parameter 1 (Toggle) bool expected")
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, Toggle)
 	local function ResetButtonCallback()
 		StarterGui:SetCore("ResetButtonCallback", Toggle)
@@ -197,7 +197,7 @@ local function checkAsset(Proto, ...)
 end
 
 local function productInfo(id, enum)
-	assert(enum.EnumType == Enum.InfoType, "productInfo: enum.EnumType is not Info")
+	assert(enum.EnumType == Enum.InfoType, "productInfo: Parameter 2 (enum) InfoType expected")
 	return Promise.new(function(resolve, reject)
 		local succ, result = pcall(Market.GetProductInfo, Market, id, enum)
 		return succ and resolve(result) or reject(result)
@@ -295,7 +295,7 @@ local function err(info, text)
 end
 
 local function isOwned(intButton)
-	assert(intButton:IsA("TextButton"))
+	assert(intButton:IsA("TextButton"), "isOwned: Parameter 1 (intButton) TextButton expected")
 	return intButton.Text:lower():match("owned")
 end
 
