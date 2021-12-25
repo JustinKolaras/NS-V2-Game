@@ -363,7 +363,7 @@ function noticeConnectionUnit()
 end
 
 local function newNotice(noticeText)
-	noticeConnectionUnit():await()
+	noticeConnectionUnit():catch(error):await()
 	NoticeDesc.Text = noticeText
 	Notice.Visible = true
 end
@@ -526,7 +526,7 @@ function mainConnectionUnit(shirtObject, pantObject)
 			if clientConfig._db.avTrigg == true then
 				return
 			end
-			advConnectionUnit():await()
+			advConnectionUnit():catch(error):await()
 
 			clientConfig._db.avExit = true
 			Exit.TextColor3 = clientConfig.greyOut
