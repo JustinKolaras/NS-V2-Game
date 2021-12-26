@@ -83,6 +83,7 @@ end
 
 function banService:Add(Id, Executor, Reason)
 	local _, Err = pcall(BanStore.SetAsync, BanStore, Settings.storeKey .. Id, { true, Executor, Reason })
+	print(typeof(Err), Err)
 	if Err then
 		retry.Set(BanStore, Settings.storeKey .. Id, 5, { true, Executor, Reason })
 			:catch(function(errorMsg)
@@ -90,6 +91,7 @@ function banService:Add(Id, Executor, Reason)
 			end)
 			:await()
 		if Err then
+			print(typeof(Err))
 			return "Error: " .. tostring(Err)
 		end
 	end
@@ -97,6 +99,7 @@ end
 
 function banService:Remove(Id)
 	local _, Err = pcall(BanStore.RemoveAsync, BanStore, Settings.storeKey .. Id)
+	print(typeof(Err), Err)
 	if Err then
 		retry.Remove(BanStore, Settings.storeKey .. Id, 5)
 			:catch(function(errorMsg)
@@ -104,6 +107,9 @@ function banService:Remove(Id)
 			end)
 			:await()
 		if Err then
+			for a, b in next, Err do
+				print(a, b)
+			end
 			return "Error: " .. tostring(Err)
 		end
 	end
