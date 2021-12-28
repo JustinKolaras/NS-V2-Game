@@ -197,7 +197,7 @@ local function checkAsset(Proto, ...)
 end
 
 local function productInfo(id, enum)
-	assert(enum.EnumType == Enum.InfoType, "productInfo: Parameter 2 (enum) InfoType expected")
+	assert(enum.EnumType == Enum.InfoType, "productInfo: Parameter 2 (enum) InfoType Enumerator expected")
 	return Promise.new(function(resolve, reject)
 		local succ, result = pcall(Market.GetProductInfo, Market, id, enum)
 		return succ and resolve(result) or reject(result)
@@ -244,14 +244,13 @@ local function stillActivated()
 	return (BuyShirt.Visible and BuyPant.Visible)
 end
 
-local function loadingState(...)
-	local data = { ... }
+local function loadingState(customText)
 	BuyOutfit.Visible = false
 	BuyPant.Visible = false
 	BuyShirt.Visible = false
 	TryOn.Visible = false
 	Loading.Visible = true
-	Loading.Text = unpack(data) or clientConfig.loadText
+	Loading.Text = customText or clientConfig.loadText
 end
 
 local function cancelLoading()
@@ -263,18 +262,22 @@ end
 local function close(Key, Type)
 	if Key == "Base" then
 		local vpChar = clientConfig.storedViewport
+
 		cancelLoading()
 		Base.Visible = false
 		ErrorNotif.Visible = false
+		ManType.Text = "2D"
+		clientConfig.connectionBreak3d = true
+
 		if not Type or Type == 0 then
 			AdvTriggFrame.Visible = false
 		end
-		ManType.Text = "2D"
-		clientConfig.connectionBreak3d = true
+
 		pcall(function()
 			vpChar.PrimaryPart = vpChar:FindFirstChild("HumanoidRootPart")
 			vpChar:SetPrimaryPartCFrame(clientConfig.originalCFrame3d)
 		end)
+
 		task.wait(1 / 60)
 		clientConfig.connectionBreak3d = false
 	elseif Key == "Notice" then
@@ -294,9 +297,9 @@ local function err(info, text)
 	end
 end
 
-local function isOwned(intButton)
-	assert(intButton:IsA("TextButton"), "isOwned: Parameter 1 (intButton) TextButton expected")
-	return intButton.Text:lower():match("owned")
+local function isOwned(indivButton)
+	assert(indivButton:IsA("TextButton"), "isOwned: Parameter 1 (indivButton) TextButton expected")
+	return indivButton.Text:lower():match("owned")
 end
 
 local function disconnect(Client)
