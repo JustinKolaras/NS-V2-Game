@@ -20,14 +20,24 @@ local Tool = ReplicatedStorage.TryOn["Shopping Bag"]
 local Util = require(ReplicatedStorage.Shared.Util)
 local Key = require(ServerStorage.Storage.Modules.Key)
 
-local serverConfig = {
+local serverConfig = setmetatable({
 	Keys = {},
+	piStatus = false,
 	templatePrefix = "http://www.roblox.com/asset/?id=%s",
 	toolName = "Shopping Bag",
 	originalClothes = {},
 	bagsEquipped = {},
 	playerAdded = {},
-}
+}, {
+	-- I'll see if I can make more of a use for this later.
+	__index = function(_, indx)
+		warn(
+			"Try On::serverConfigError: Attempt to get serverConfig value with a nil index. -> serverConfig["
+				.. indx
+				.. "]?"
+		)
+	end,
+})
 
 local templates = {}
 
@@ -47,9 +57,9 @@ function templates.New(Shirt, Pant)
 	}
 end
 
-function OnClicked(Player, shirtId, pantsId, templateTable)
+function OnClicked(Player, shirtId, pantsId, templateTable, character)
 	if IsBagEquipped(Player) then
-		Event:FireClient(Player, "Open", shirtId, pantsId, templateTable)
+		Event:FireClient(Player, "Open", shirtId, pantsId, templateTable, character)
 	end
 end
 
@@ -75,7 +85,8 @@ function customOnMouseClick(Player, TheirTool)
 						Player,
 						GetId(shirt),
 						GetId(pants),
-						templates.New(shirt.ShirtTemplate:match("%d+"), pants.PantsTemplate:match("%d+"))
+						templates.New(shirt.ShirtTemplate:match("%d+"), pants.PantsTemplate:match("%d+")),
+						ClickDetector.Parent.Parent
 					)
 				end
 			end
@@ -148,6 +159,13 @@ Players.PlayerAdded:Connect(function(Player)
 	local playerKey = Key.new(50)
 	serverConfig.Keys[Player.UserId] = playerKey
 	Event:FireClient(Player, "Config", playerKey)
+
+	if not serverConfig.piStatus then
+		serverConfig.piStatus = true
+		for _, model in next, Folder:GetChildren() do
+			Util:Create("StringValue", { Name = "PI", Value = Key.new(10), Parent = model })
+		end
+	end
 
 	task.defer(function()
 		local theirTool = Util:Clone(Tool, { Parent = Player:WaitForChild("Backpack") })

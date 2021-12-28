@@ -54,7 +54,7 @@ local Event = TryOnFolder:FindFirstChild("TryOn Event")
 local Function = TryOnFolder:FindFirstChild("TryOn Function")
 local viewportCharacter = TryOnFolder:FindFirstChild("Character")
 
-local clientConfig = {
+local clientConfig = setmetatable({
 	key = nil,
 	templatePrefix = "http://www.roblox.com/asset/?id=%d",
 	buyOutfitFormat = 'Buy Outfit <font color="#3CDD52">R$%d</font>',
@@ -92,6 +92,7 @@ local clientConfig = {
 	isAdvancedView = false,
 	advSpeed = 1,
 	connectionBreak3d = false,
+	currentPi = nil,
 	originalCFrame3d = nil,
 	storedViewport = nil,
 	previousHumanoidCF = CFrame.new(),
@@ -109,7 +110,16 @@ local clientConfig = {
 	noticeExecErrorText = "Please join our Discord server with this screenshot as a bug report. This usually has something to do with your avatar - try removing packages!",
 	loadingTimes = {},
 	archivedLoads = {},
-}
+}, {
+	-- I'll see if I can make more of a use for this later.
+	__index = function(_, indx)
+		warn(
+			"Try On Client::clientConfigError: Attempt to get clientConfig value with a nil index. -> clientConfig["
+				.. indx
+				.. "]?"
+		)
+	end,
+})
 
 local Time = {}
 local Templates = {}
@@ -122,7 +132,8 @@ end
 function Time.Get()
 	local toReturn = tostring(os.clock() - clientConfig.loadingTimes[1])
 	toReturn = (#tostring(clientConfig.loadingTimes[1]) < 3)
-		and toReturn:sub(1, #tostring(clientConfig.loadingTimes[1])) or toReturn:sub(1, 3)
+			and toReturn:sub(1, #tostring(clientConfig.loadingTimes[1]))
+		or toReturn:sub(1, 3)
 
 	table.move(clientConfig.loadingTimes, 1, 1, select("#", clientConfig.archivedLoads), clientConfig.archivedLoads)
 
@@ -157,20 +168,27 @@ function core.elements(Toggle)
 end
 
 local function fireServer(...)
+	print("In fireServer Function..")
 	Event:FireServer(clientConfig.key, ...)
 end
 
 local function tryOn(...)
+	print("Trying On..")
 	AdvTriggFrame.Visible = true
-	fireServer("TryOn", ...)
 	TryOn.Text = "Take Off Outfit"
 	clientConfig.isTryingOn = true
+	fireServer("TryOn", ...)
 end
 
 local function takeOff()
 	fireServer("TakeOff")
 	TryOn.Text = "Try On Outfit"
 	clientConfig.isTryingOn = false
+end
+
+local function getPi(mannequinModel)
+	assert(mannequinModel.PI.Value, "getPi: No personal identification value")
+	return mannequinModel.PI.Value
 end
 
 local function checkAsset(Proto, ...)
@@ -432,16 +450,21 @@ function advConnectionUnit()
 end
 
 function mainConnectionUnit(shirtObject, pantObject)
+	print("Inside outermost")
 	for _, b in next, clientConfig._connections.terminal do
 		b:Disconnect()
 		b = nil
 	end
 	return Promise.new(function(resolve)
+		print("Inside")
 		clientConfig._connections.terminal.close = CloseButton.MouseButton1Click:Connect(function()
 			close("Base")
 		end)
+		print(typeof(TryOn), TryOn.Name, tostring(clientConfig._connections.terminal.tryOn))
 		clientConfig._connections.terminal.tryOn = TryOn.MouseButton1Click:Connect(function()
+			print("Inside event")
 			if TryOn.Text == "Try On Outfit" then
+				print("Firing functions")
 				tryOn(clientConfig.globalTemplates.TemplateS, clientConfig.globalTemplates.TemplateP)
 				close("Base", 1)
 			elseif TryOn.Text == "Take Off Outfit" then
@@ -573,6 +596,7 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 			end
 			local shirt, pant = Data[1], Data[2]
 			local templateTable = Data[3]
+			local characterModel = Data[4]
 			local charTemplateTable = Templates.New(
 				Player.Character.Shirt.ShirtTemplate:match("%d+"),
 				Player.Character.Pants.PantsTemplate:match("%d+")
@@ -581,9 +605,15 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 
 			onCancel(loadingState)
 
-			if not clientConfig.isTryingOn then
-				AdvTriggFrame.Visible = false
+			if getPi(characterModel) ~= clientConfig.currentPi then
+				print("Running.")
+				if clientConfig.isTryingOn then
+					takeOff()
+					AdvTriggFrame.Visible = false
+				end
 			end
+
+			clientConfig.currentPi = getPi(characterModel)
 			Loading.Text = clientConfig.loadText
 			ManType.Visible = false
 			Base.Visible = true
