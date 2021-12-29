@@ -131,9 +131,18 @@ local clientConfig = setmetatable({
 	end,
 })
 
-local Time = {}
-local Templates = {}
-local core = {}
+local function makeLibraryMeta(Name)
+	assert(Name and typeof(Name) == "string", "makeLibrarymeta: Parameter 1 (Name) string expected")
+	return {
+		__index = function(_, indx)
+			error(("Try On Client::inBuiltLibraryError: %s is not a function of %s."):format(indx, Name), 2)
+		end,
+	}
+end
+
+local Time = setmetatable({}, makeLibraryMeta("Time"))
+local Templates = setmetatable({}, makeLibraryMeta("Templates"))
+local Core = setmetatable({}, makeLibraryMeta("Core"))
 
 function Time.Set()
 	table.insert(clientConfig.loadingTimes, 1, os.clock())
@@ -161,7 +170,7 @@ function Templates.New(Shirt, Pant)
 	}
 end
 
-function core.elements(Toggle)
+function Core.elements(Toggle)
 	local ok, _, timeout = nil, nil, 0
 	assert(typeof(Toggle) == "boolean", "core.elements: Parameter 1 (Toggle) bool expected")
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, Toggle)
@@ -436,7 +445,7 @@ function advConnectionUnit()
 			end
 
 			clientConfig.isAdvancedView = false
-			core.elements(true)
+			Core.elements(true)
 
 			AdvView.Visible = false
 			RunService:UnbindFromRenderStep("CameraRotation")
@@ -581,7 +590,7 @@ function mainConnectionUnit(shirtObject, pantObject)
 			local Character = Player.Character
 
 			clientConfig.isAdvancedView = true
-			core.elements(false)
+			Core.elements(false)
 			Character.HumanoidRootPart.Anchored = true
 			clientConfig.previousHumanoidCF = Character.HumanoidRootPart.CFrame
 

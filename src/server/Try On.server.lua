@@ -49,7 +49,16 @@ local serverConfig = setmetatable({
 	end,
 })
 
-local templates = {}
+local function makeLibraryMeta(Name)
+	assert(Name and typeof(Name) == "string", "makeLibrarymeta: Parameter 1 (Name) string expected")
+	return {
+		__index = function(_, indx)
+			error(("Try On Client::inBuiltLibraryError: %s is not a function of %s."):format(indx, Name), 2)
+		end,
+	}
+end
+
+local Templates = setmetatable({}, makeLibraryMeta("Templates"))
 
 local function GetId(Object)
 	local result = Object:FindFirstChild("ID")
@@ -60,7 +69,7 @@ local function IsBagEquipped(Player)
 	return serverConfig.bagsEquipped[Player.Name]
 end
 
-function templates.New(Shirt, Pant)
+function Templates.New(Shirt, Pant)
 	return {
 		TemplateS = Shirt,
 		TemplateP = Pant,
@@ -95,7 +104,7 @@ function customOnMouseClick(Player, TheirTool)
 						Player,
 						GetId(shirt),
 						GetId(pants),
-						templates.New(shirt.ShirtTemplate:match("%d+"), pants.PantsTemplate:match("%d+")),
+						Templates.New(shirt.ShirtTemplate:match("%d+"), pants.PantsTemplate:match("%d+")),
 						ClickDetector.Parent.Parent
 					)
 				end
