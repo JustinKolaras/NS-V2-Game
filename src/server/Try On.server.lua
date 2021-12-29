@@ -171,7 +171,6 @@ Players.PlayerAdded:Connect(function(Player)
 	table.insert(
 		PermConnections[Player.UserId],
 		Player.CharacterAdded:Connect(function()
-			print("CharAdded")
 			local theirTool = Util:Clone(Tool, { Parent = Player:WaitForChild("Backpack") })
 			Rewrite(Player, theirTool)
 			task.delay(0.2, function()
