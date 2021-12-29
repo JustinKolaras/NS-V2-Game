@@ -440,7 +440,7 @@ function advConnectionUnit()
 			end
 		end)
 		clientConfig.advExFunc = function()
-			if clientConfig._db.avExit == true then
+			if clientConfig._db.avExit then
 				return
 			end
 
@@ -552,7 +552,7 @@ function mainConnectionUnit(shirtObject, pantObject)
 				ManType.Text = "3D"
 				temp = RunService.Heartbeat:Connect(function(t)
 					local atr = math.rad(180) * t / 3
-					if clientConfig.connectionBreak3d == true then
+					if clientConfig.connectionBreak3d then
 						temp:Disconnect()
 						temp = nil
 					end
@@ -569,7 +569,7 @@ function mainConnectionUnit(shirtObject, pantObject)
 			end
 		end)
 		clientConfig._connections.adv.trigg = AdvTrigger.MouseButton1Click:Connect(function()
-			if clientConfig._db.avTrigg == true then
+			if clientConfig._db.avTrigg then
 				return
 			end
 			advConnectionUnit():catch(error):await()
@@ -614,9 +614,11 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 			if Base.Visible or Notice.Visible or clientConfig.isAdvancedView then
 				return
 			end
+
 			local shirt, pant = Data[1], Data[2]
 			local templateTable = Data[3]
 			local characterModel = Data[4]
+			local characterPi = getPi(characterModel)
 			local charTemplateTable = Templates.New(
 				Player.Character.Shirt.ShirtTemplate:match("%d+"),
 				Player.Character.Pants.PantsTemplate:match("%d+")
@@ -625,14 +627,14 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 
 			onCancel(loadingState)
 
-			if getPi(characterModel) ~= clientConfig.currentPi then
+			if characterPi ~= clientConfig.currentPi then
 				if clientConfig.isTryingOn then
 					takeOff()
 					AdvTriggFrame.Visible = false
 				end
 			end
 
-			clientConfig.currentPi = getPi(characterModel)
+			clientConfig.currentPi = characterPi
 			Loading.Text = clientConfig.loadText
 			ManType.Visible = false
 			Base.Visible = true
@@ -656,13 +658,6 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 			local outfitVisible, tryOnVisible = true, true
 			local pantOwned, shirtOwned = false, false
 
-			if (templateTable.TemplateS ~= charTemplateTable.TemplateS) and (not pantOwned or not shirtOwned) then
-				takeOff()
-			end
-
-			-- This is so we can retrieve the template objects in other functions
-			-- without having to pass them (specifically the Try On button functionality).
-			-- I'd rather this method over others.
 			clientConfig.globalTemplates.TemplateS = templateTable.TemplateS
 			clientConfig.globalTemplates.TemplateP = templateTable.TemplateP
 
@@ -695,6 +690,7 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 				end)
 				:catch(error)
 				:await()
+
 			if not pantOwned and not shirtOwned then
 				BuyOutfit.Text = clientConfig.buyOutfitFormat:format(infoShirt.PriceInRobux + infoPant.PriceInRobux)
 			end

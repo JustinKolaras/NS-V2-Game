@@ -215,15 +215,6 @@ Players.PlayerAdded:Connect(function(Player)
 		end)
 		:catch(error)
 		:await()
-
-	local Count = 0
-	for _, b in next, Player:WaitForChild("Backpack"):GetChildren() do
-		Count += (b.Name == serverConfig.toolName) and 1 or 0
-		if Count > 1 then
-			b:Destroy()
-			warn("An additional tool was found and destroyed in a player's backpack!")
-		end
-	end
 end)
 
 Players.PlayerRemoving:Connect(function(Player)
