@@ -53,7 +53,7 @@ local function makeLibraryMeta(Name)
 	assert(Name and typeof(Name) == "string", "makeLibrarymeta: Parameter 1 (Name) string expected")
 	return {
 		__index = function(_, indx)
-			error(("Try On Client::inBuiltLibraryError: %s is not a function of %s."):format(indx, Name), 2)
+			error(("Try On::inBuiltLibraryError: %s is not a function of %s."):format(indx, Name), 2)
 		end,
 	}
 end
