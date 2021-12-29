@@ -178,12 +178,10 @@ function core.elements(Toggle)
 end
 
 local function fireServer(...)
-	print("In fireServer Function..")
 	Event:FireServer(clientConfig.key, ...)
 end
 
 local function tryOn(...)
-	print("Trying On..")
 	AdvTriggFrame.Visible = true
 	TryOn.Text = "Take Off Outfit"
 	clientConfig.isTryingOn = true
@@ -335,8 +333,10 @@ local function disconnect(Client)
 		for _, outermost in next, clientConfig._connections do
 			if typeof(outermost) == "table" then -- Not expecting to next multiple tables, so we'll loop here
 				for _, innermost in next, outermost do
-					pcall(innermost.Disconnect, innermost)
-					innermost = nil
+					if typeof(innermost) == "RBXScriptConnection" then
+						pcall(innermost.Disconnect, innermost)
+						innermost = nil
+					end
 				end
 			else
 				pcall(outermost.Disconnect, outermost)
@@ -382,8 +382,10 @@ end
 
 function noticeConnectionUnit()
 	for _, b in next, clientConfig._connections.notice do
-		b:Disconnect()
-		b = nil
+		if typeof(b) == "RBXScriptConnection" then
+			b:Disconnect()
+			b = nil
+		end
 	end
 	return Promise.new(function(resolve)
 		clientConfig._connections.notice.close = NoticeCloseButton.MouseButton1Click:Connect(function()
@@ -401,8 +403,10 @@ end
 
 function advConnectionUnit()
 	for _, b in next, clientConfig._connections.advancedView do
-		b:Disconnect()
-		b = nil
+		if typeof(b) == "RBXScriptConnection" then
+			b:Disconnect()
+			b = nil
+		end
 	end
 	return Promise.new(function(resolve)
 		clientConfig._connections.advancedView.speedInputTPCS = SpeedInput
@@ -440,7 +444,7 @@ function advConnectionUnit()
 			clientConfig.advSpeed = SpeedInput.PlaceholderText
 			AdvTriggFrame.Visible = true
 			Player.Character.HumanoidRootPart.CFrame = clientConfig.previousHumanoidCF
-			clientConfig.previousHumanoidCF = nil
+			clientConfig.previousHumanoidCF = CFrame.new()
 			Player.Character.HumanoidRootPart.Anchored = false
 
 			clientConfig._db.avTrigg = true
@@ -460,21 +464,18 @@ function advConnectionUnit()
 end
 
 function mainConnectionUnit(shirtObject, pantObject)
-	print("Inside outermost")
 	for _, b in next, clientConfig._connections.terminal do
-		b:Disconnect()
-		b = nil
+		if typeof(b) == "RBXScriptConnection" then
+			b:Disconnect()
+			b = nil
+		end
 	end
 	return Promise.new(function(resolve)
-		print("Inside")
 		clientConfig._connections.terminal.close = CloseButton.MouseButton1Click:Connect(function()
-			close("Base")
+			close("Base", 1)
 		end)
-		print(typeof(TryOn), TryOn.Name, tostring(clientConfig._connections.terminal.tryOn))
 		clientConfig._connections.terminal.tryOn = TryOn.MouseButton1Click:Connect(function()
-			print("Inside event")
 			if TryOn.Text == "Try On Outfit" then
-				print("Firing functions")
 				tryOn(clientConfig.globalTemplates.TemplateS, clientConfig.globalTemplates.TemplateP)
 				close("Base", 1)
 			elseif TryOn.Text == "Take Off Outfit" then
@@ -598,16 +599,12 @@ function mainConnectionUnit(shirtObject, pantObject)
 end
 
 clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key, ...)
-	print("Event run")
 	local Data = { ... }
 	if Key == "Open" then
-		print("Key is open")
 		clientConfig._promise.mainLoad = Promise.new(function(_, _, onCancel)
-			print("Inside")
 			if Base.Visible or Notice.Visible or clientConfig.isAdvancedView then
 				return
 			end
-			print("Past")
 			local shirt, pant = Data[1], Data[2]
 			local templateTable = Data[3]
 			local characterModel = Data[4]
@@ -617,19 +614,14 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 			)
 			local infoShirt, infoPant
 
-			print("Variable declaration")
-
 			onCancel(loadingState)
 
 			if getPi(characterModel) ~= clientConfig.currentPi then
-				print("Running.")
 				if clientConfig.isTryingOn then
 					takeOff()
 					AdvTriggFrame.Visible = false
 				end
 			end
-
-			print("piCheck")
 
 			clientConfig.currentPi = getPi(characterModel)
 			Loading.Text = clientConfig.loadText
@@ -637,8 +629,6 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 			Base.Visible = true
 
 			Time.Set()
-
-			print("Set")
 
 			productInfo(shirt, Enum.InfoType.Asset)
 				:andThen(function(result)
@@ -654,8 +644,6 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 				:catch(error)
 				:await()
 
-			print("Prod info")
-
 			local outfitVisible, tryOnVisible = true, true
 			local pantOwned, shirtOwned = false, false
 
@@ -663,23 +651,15 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 				takeOff()
 			end
 
-			print("Mild checks")
-
 			-- This is so we can retrieve the template objects in other functions
 			-- without having to pass them (specifically the Try On button functionality).
 			-- I'd rather this method over others.
 			clientConfig.globalTemplates.TemplateS = templateTable.TemplateS
 			clientConfig.globalTemplates.TemplateP = templateTable.TemplateP
 
-			print("Set global templates")
-
-			print("Here")
 			manageIndividuals(false)
-			print("Individuals")
 			createViewport(templateTable):catch(error):await()
-			print("Viewport")
 			mainConnectionUnit(shirt, pant):catch(error):await()
-			print("Connection")
 			checkAsset(true, shirt)
 				:andThen(function(Type)
 					if Type == 1 then
@@ -736,10 +716,11 @@ Util:WaitForChildOfClass(Player.Character, "Humanoid", 2):andThen(function(resul
 	if result then
 		clientConfig._connections.died = result.Died:Connect(function()
 			if Base.Visible then
-				close("Base", 1)
+				close("Base")
 			end
 			if clientConfig.isTryingOn then
 				takeOff()
+				AdvTriggFrame.Visible = false
 			end
 		end)
 	end

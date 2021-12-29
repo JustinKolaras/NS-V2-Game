@@ -13,6 +13,7 @@ local Event = ReplicatedStorage.TryOn:FindFirstChild("TryOn Event")
 local Function = ReplicatedStorage.TryOn:FindFirstChild("TryOn Function")
 
 local Connections = {}
+local PermConnections = {}
 
 local Folder = workspace.Mannequins
 local Tool = ReplicatedStorage.TryOn["Shopping Bag"]
@@ -27,7 +28,6 @@ local serverConfig = setmetatable({
 	toolName = "Shopping Bag",
 	originalClothes = {},
 	bagsEquipped = {},
-	playerAdded = {},
 }, {
 	__index = function(_, indx)
 		error(
@@ -162,13 +162,23 @@ end
 
 Players.PlayerAdded:Connect(function(Player)
 	Connections[Player.UserId] = {}
-	serverConfig.playerAdded[Player.UserId] = true
-
-	local Character = Player.Character or Player.CharacterAdded:Wait()
+	PermConnections[Player.UserId] = {}
 
 	local playerKey = Key.new(50)
 	serverConfig.Keys[Player.UserId] = playerKey
 	Event:FireClient(Player, "Config", playerKey)
+
+	table.insert(
+		PermConnections[Player.UserId],
+		Player.CharacterAdded:Connect(function()
+			print("CharAdded")
+			local theirTool = Util:Clone(Tool, { Parent = Player:WaitForChild("Backpack") })
+			Rewrite(Player, theirTool)
+			task.delay(0.2, function()
+				Event:FireClient(Player, "Config", playerKey)
+			end)
+		end)
+	)
 
 	if not serverConfig.piStatus then
 		serverConfig.piStatus = true
@@ -177,26 +187,7 @@ Players.PlayerAdded:Connect(function(Player)
 		end
 	end
 
-	task.defer(function()
-		local theirTool = Util:Clone(Tool, { Parent = Player:WaitForChild("Backpack") })
-		Rewrite(Player, theirTool)
-		task.delay(0.1, function()
-			serverConfig.playerAdded[Player.UserId] = false
-		end)
-	end)
-
-	table.insert(
-		Connections[Player.UserId],
-		Player.CharacterAdded:Connect(function()
-			if not serverConfig.playerAdded[Player.UserId] then
-				local theirTool = Util:Clone(Tool, { Parent = Player:WaitForChild("Backpack") })
-				Rewrite(Player, theirTool)
-				task.delay(0.2, function()
-					Event:FireClient(Player, "Config", playerKey)
-				end)
-			end
-		end)
-	)
+	local Character = Player.Character or Player.CharacterAdded:Wait()
 
 	Util
 		:WaitForChildOfClass(Character, "Shirt", 1)
