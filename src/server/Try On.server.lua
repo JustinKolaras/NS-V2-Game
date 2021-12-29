@@ -29,12 +29,22 @@ local serverConfig = setmetatable({
 	bagsEquipped = {},
 	playerAdded = {},
 }, {
-	-- I'll see if I can make more of a use for this later.
 	__index = function(_, indx)
-		warn(
-			"Try On::serverConfigError: Attempt to get serverConfig value with a nil index. -> serverConfig["
-				.. indx
-				.. "]?"
+		error(
+			("Try On::serverConfigError: Attempt to get serverConfig value with a nil index. -> serverConfig[%s]?"):format(
+				indx
+			),
+			2
+		)
+	end,
+
+	__newindex = function(_, indx, val)
+		error(
+			("Try On::serverConfigError: New items are disallowed! -> Operation (serverConfig[%s] = %s) failed."):format(
+				indx,
+				tostring(val)
+			),
+			2
 		)
 	end,
 })

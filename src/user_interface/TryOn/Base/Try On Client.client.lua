@@ -55,7 +55,7 @@ local Function = TryOnFolder:FindFirstChild("TryOn Function")
 local viewportCharacter = TryOnFolder:FindFirstChild("Character")
 
 local clientConfig = setmetatable({
-	key = nil,
+	key = 0,
 	templatePrefix = "http://www.roblox.com/asset/?id=%d",
 	buyOutfitFormat = 'Buy Outfit <font color="#3CDD52">R$%d</font>',
 	buyShirtFormat = 'Shirt <b><font color="#3CDD52">R$%d</font></b>',
@@ -63,27 +63,27 @@ local clientConfig = setmetatable({
 	ownedFormat = '<b><font color="#3CDD52">OWNED</font></b>',
 	_connections = {
 		terminal = {
-			close = nil,
-			tryOn = nil,
-			buyS = nil,
-			buyP = nil,
-			buyOutfit = nil,
-			manType = nil,
+			close = 0,
+			tryOn = 0,
+			buyS = 0,
+			buyP = 0,
+			buyOutfit = 0,
+			manType = 0,
 		},
 		advancedView = {
-			trigger = nil,
-			speedInputFocusLost = nil,
-			speedInputTPCS = nil,
-			exit = nil,
+			trigger = 0,
+			speedInputFocusLost = 0,
+			speedInputTPCS = 0,
+			exit = 0,
 		},
 		notice = {
-			close = nil,
+			close = 0,
 		},
-		died = nil,
-		clientEvent = nil,
+		died = 0,
+		clientEvent = 0,
 	},
 	_promise = {
-		mainLoad = nil,
+		mainLoad = 0,
 	},
 	_db = {
 		avTrigg = false,
@@ -92,17 +92,17 @@ local clientConfig = setmetatable({
 	isAdvancedView = false,
 	advSpeed = 1,
 	connectionBreak3d = false,
-	currentPi = nil,
-	originalCFrame3d = nil,
-	storedViewport = nil,
+	currentPi = 0,
+	originalCFrame3d = 0,
+	storedViewport = 0,
 	previousHumanoidCF = CFrame.new(),
 	buyIndividualObjectYScale = 0.395,
 	tryOnObjectYScale = 0.14,
 	greyOut = Color3.fromRGB(118, 118, 118),
-	advExFunc = nil,
+	advExFunc = 0,
 	globalTemplates = {
-		TemplateS = nil,
-		TemplateP = nil,
+		TemplateS = 0,
+		TemplateP = 0,
 	},
 	isTryingOn = false,
 	loadText = Loading.Text,
@@ -111,12 +111,22 @@ local clientConfig = setmetatable({
 	loadingTimes = {},
 	archivedLoads = {},
 }, {
-	-- I'll see if I can make more of a use for this later.
 	__index = function(_, indx)
-		warn(
-			"Try On Client::clientConfigError: Attempt to get clientConfig value with a nil index. -> clientConfig["
-				.. indx
-				.. "]?"
+		error(
+			(
+				"Try On Client::clientConfigError: Attempt to get clientConfig value with a nil index. -> clientConfig[%s]?"
+			):format(indx),
+			2
+		)
+	end,
+
+	__newindex = function(_, indx, val)
+		error(
+			("Try On Client::clientConfigError: New items are disallowed! -> Operation (clientConfig[%s] = %s) failed."):format(
+				indx,
+				tostring(val)
+			),
+			2
 		)
 	end,
 })
@@ -195,13 +205,13 @@ local function checkAsset(Proto, ...)
 	local Data = { ... }
 	return Promise.new(function(resolve)
 		for a, b in next, Data do
-			if typeof(Proto) == "boolean" and Proto == false then
+			if typeof(Proto) == "boolean" and not Proto then
 				if Market:PlayerOwnsAsset(Player, b) then
 					resolve(1)
 				else
 					resolve(2)
 				end
-			elseif typeof(Proto) == "boolean" and Proto == true then
+			elseif typeof(Proto) == "boolean" and Proto then
 				if Market:PlayerOwnsAsset(Player, b) then
 					if a == select("#", Data) then
 						resolve(1)
@@ -594,6 +604,7 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 			if Base.Visible or Notice.Visible or clientConfig.isAdvancedView then
 				return
 			end
+			print("Past")
 			local shirt, pant = Data[1], Data[2]
 			local templateTable = Data[3]
 			local characterModel = Data[4]
@@ -602,6 +613,8 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 				Player.Character.Pants.PantsTemplate:match("%d+")
 			)
 			local infoShirt, infoPant
+
+			print("Variable declaration")
 
 			onCancel(loadingState)
 
@@ -613,12 +626,16 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 				end
 			end
 
+			print("piCheck")
+
 			clientConfig.currentPi = getPi(characterModel)
 			Loading.Text = clientConfig.loadText
 			ManType.Visible = false
 			Base.Visible = true
 
 			Time.Set()
+
+			print("Set")
 
 			productInfo(shirt, Enum.InfoType.Asset)
 				:andThen(function(result)
@@ -634,6 +651,8 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 				:catch(error)
 				:await()
 
+			print("Prod info")
+
 			local outfitVisible, tryOnVisible = true, true
 			local pantOwned, shirtOwned = false, false
 
@@ -641,15 +660,23 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 				takeOff()
 			end
 
+			print("Mild checks")
+
 			-- This is so we can retrieve the template objects in other functions
 			-- without having to pass them (specifically the Try On button functionality).
 			-- I'd rather this method over others.
 			clientConfig.globalTemplates.TemplateS = templateTable.TemplateS
 			clientConfig.globalTemplates.TemplateP = templateTable.TemplateP
 
+			print("Set global templates")
+
+			print("Here")
 			manageIndividuals(false)
+			print("Individuals")
 			createViewport(templateTable):catch(error):await()
+			print("Viewport")
 			mainConnectionUnit(shirt, pant):catch(error):await()
+			print("Connection")
 			checkAsset(true, shirt)
 				:andThen(function(Type)
 					if Type == 1 then
