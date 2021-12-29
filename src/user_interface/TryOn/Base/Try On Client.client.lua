@@ -598,9 +598,12 @@ function mainConnectionUnit(shirtObject, pantObject)
 end
 
 clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key, ...)
+	print("Event run")
 	local Data = { ... }
 	if Key == "Open" then
+		print("Key is open")
 		clientConfig._promise.mainLoad = Promise.new(function(_, _, onCancel)
+			print("Inside")
 			if Base.Visible or Notice.Visible or clientConfig.isAdvancedView then
 				return
 			end
