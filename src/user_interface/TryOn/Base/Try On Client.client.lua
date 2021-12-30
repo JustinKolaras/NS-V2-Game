@@ -149,12 +149,13 @@ function Time.Set()
 end
 
 function Time.Get()
-	local toReturn = tostring(os.clock() - clientConfig.loadingTimes[1])
-	toReturn = (#tostring(clientConfig.loadingTimes[1]) < 3)
-			and toReturn:sub(1, #tostring(clientConfig.loadingTimes[1]))
-		or toReturn:sub(1, 3)
+	local loadingTimes = clientConfig.loadingTimes
+	local archivedLoads = clientConfig.archivedLoads
 
-	table.move(clientConfig.loadingTimes, 1, 1, select("#", clientConfig.archivedLoads), clientConfig.archivedLoads)
+	local toReturn = tostring(os.clock() - loadingTimes[1])
+	toReturn = (#tostring(loadingTimes[1]) < 3) and toReturn:sub(1, #tostring(loadingTimes[1])) or toReturn:sub(1, 3)
+
+	table.move(loadingTimes, 1, 1, select("#", archivedLoads), archivedLoads)
 
 	return tonumber(toReturn)
 end
@@ -634,7 +635,9 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 			clientConfig.currentPi = characterPi
 			Loading.Text = clientConfig.loadText
 			ManType.Visible = false
-			Base.Visible = true
+			if not Notice.Visible then
+				Base.Visible = true
+			end
 
 			Time.Set()
 
