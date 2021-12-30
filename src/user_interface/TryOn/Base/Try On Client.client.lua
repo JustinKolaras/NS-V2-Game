@@ -204,8 +204,9 @@ local function takeOff()
 end
 
 local function getPi(mannequinModel)
-	assert(mannequinModel.PI.Value, "getPi: No personal identification value")
-	return mannequinModel.PI.Value
+	local value = mannequinModel:GetAttribute("PI")
+	assert(value, "getPi: No personal identification value")
+	return value
 end
 
 local function checkAsset(Proto, ...)

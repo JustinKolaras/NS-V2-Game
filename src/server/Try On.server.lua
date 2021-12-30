@@ -23,7 +23,7 @@ local Key = require(ServerStorage.Storage.Modules.Key)
 
 do
 	for _, model in ipairs(Folder:GetChildren()) do
-		Util:Create("StringValue", { Name = "PI", Value = Key.new(10), Parent = model })
+		model:SetAttribute("PI", Key.new(10))
 	end
 end
 
