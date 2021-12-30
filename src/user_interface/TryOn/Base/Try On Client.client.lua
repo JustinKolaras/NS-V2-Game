@@ -664,6 +664,7 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 			manageIndividuals(false)
 			createViewport(templateTable):catch(error):await()
 			mainConnectionUnit(shirt, pant):catch(error):await()
+
 			checkAsset(true, shirt)
 				:andThen(function(Type)
 					if Type == 1 then
@@ -677,6 +678,7 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 				end)
 				:catch(error)
 				:await()
+
 			checkAsset(true, pant)
 				:andThen(function(Type)
 					if Type == 1 then
