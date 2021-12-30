@@ -36,20 +36,19 @@ local serverConfig = setmetatable({
 }, {
 	__index = function(_, indx)
 		error(
-			("Try On::serverConfigError: Attempt to get serverConfig value with a nil index. -> serverConfig[%s]?"):format(
-				indx
-			),
-			2
+			(
+				"Try On::serverConfigError: Attempt to get serverConfig value with a nil index. -> serverConfig[%s]?\n\n%s"
+			):format(indx, debug.traceback())
 		)
 	end,
 
 	__newindex = function(_, indx, val)
 		error(
-			("Try On::serverConfigError: New items are disallowed! -> Operation (serverConfig[%s] = %s) failed."):format(
+			("Try On::serverConfigError: New items are disallowed! -> Operation (serverConfig[%s] = %s) failed.\n\n%s"):format(
 				indx,
-				tostring(val)
-			),
-			2
+				tostring(val),
+				debug.traceback()
+			)
 		)
 	end,
 })
@@ -58,7 +57,9 @@ local function makeLibraryMeta(Name)
 	assert(Name and typeof(Name) == "string", "makeLibraryMeta: Parameter 1 (Name) string expected")
 	return {
 		__index = function(_, indx)
-			error(("Try On::inBuiltLibraryError: %s is not a function of %s."):format(indx, Name), 2)
+			error(
+				("Try On::inBuiltLibraryError: %s is not a function of %s.\n\n%s"):format(indx, Name, debug.traceback())
+			)
 		end,
 	}
 end
