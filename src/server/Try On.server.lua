@@ -66,8 +66,8 @@ end
 local Templates = setmetatable({}, makeLibraryMeta("Templates"))
 
 local function GetId(Object)
-	local result = Object:FindFirstChild("ID")
-	return result and result.Value or "nil"
+	local result = Object:GetAttribute("ID")
+	return result and result or "nil"
 end
 
 local function IsBagEquipped(Player)
