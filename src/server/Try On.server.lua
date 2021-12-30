@@ -21,9 +21,14 @@ local Tool = ReplicatedStorage.TryOn["Shopping Bag"]
 local Util = require(ReplicatedStorage.Shared.Util)
 local Key = require(ServerStorage.Storage.Modules.Key)
 
+do
+	for _, model in ipairs(Folder:GetChildren()) do
+		Util:Create("StringValue", { Name = "PI", Value = Key.new(10), Parent = model })
+	end
+end
+
 local serverConfig = setmetatable({
 	Keys = {},
-	piStatus = false,
 	templatePrefix = "http://www.roblox.com/asset/?id=%s",
 	toolName = "Shopping Bag",
 	originalClothes = {},
@@ -50,7 +55,7 @@ local serverConfig = setmetatable({
 })
 
 local function makeLibraryMeta(Name)
-	assert(Name and typeof(Name) == "string", "makeLibrarymeta: Parameter 1 (Name) string expected")
+	assert(Name and typeof(Name) == "string", "makeLibraryMeta: Parameter 1 (Name) string expected")
 	return {
 		__index = function(_, indx)
 			error(("Try On::inBuiltLibraryError: %s is not a function of %s."):format(indx, Name), 2)
@@ -142,7 +147,7 @@ Event.OnServerEvent:Connect(function(Player, ClientKey, Starter, ...)
 end)
 
 function Rewrite(Player, TheirTool)
-	for _, b in next, Connections[Player.UserId] do
+	for _, b in ipairs(Connections[Player.UserId]) do
 		if b ~= nil then
 			b:Disconnect()
 			b = nil
@@ -187,13 +192,6 @@ Players.PlayerAdded:Connect(function(Player)
 			end)
 		end)
 	)
-
-	if not serverConfig.piStatus then
-		serverConfig.piStatus = true
-		for _, model in next, Folder:GetChildren() do
-			Util:Create("StringValue", { Name = "PI", Value = Key.new(10), Parent = model })
-		end
-	end
 
 	local Character = Player.Character or Player.CharacterAdded:Wait()
 

@@ -132,7 +132,7 @@ local clientConfig = setmetatable({
 })
 
 local function makeLibraryMeta(Name)
-	assert(Name and typeof(Name) == "string", "makeLibrarymeta: Parameter 1 (Name) string expected")
+	assert(Name and typeof(Name) == "string", "makeLibraryMeta: Parameter 1 (Name) string expected")
 	return {
 		__index = function(_, indx)
 			error(("Try On Client::inBuiltLibraryError: %s is not a function of %s."):format(indx, Name), 2)
@@ -211,7 +211,7 @@ end
 local function checkAsset(Proto, ...)
 	local Data = { ... }
 	return Promise.new(function(resolve)
-		for a, b in next, Data do
+		for a, b in ipairs(Data) do
 			if typeof(Proto) == "boolean" and not Proto then
 				if Market:PlayerOwnsAsset(Player, b) then
 					resolve(1)
@@ -339,9 +339,9 @@ end
 
 local function disconnect(Client)
 	if Client.UserId == Player.UserId then
-		for _, outermost in next, clientConfig._connections do
-			if typeof(outermost) == "table" then -- Not expecting to next multiple tables, so we'll loop here
-				for _, innermost in next, outermost do
+		for _, outermost in pairs(clientConfig._connections) do
+			if typeof(outermost) == "table" then -- Not expecting to loop multiple tables, so we'll loop here
+				for _, innermost in pairs(outermost) do
 					if typeof(innermost) == "RBXScriptConnection" then
 						pcall(innermost.Disconnect, innermost)
 						innermost = nil
@@ -366,7 +366,7 @@ function createViewport(templates)
 		local newModel = Util:Create("Model", { Name = "Character", Parent = Viewport })
 
 		local hrp
-		for _, b in next, clone:GetChildren() do
+		for _, b in ipairs(clone:GetChildren()) do
 			if b.Name == "HumanoidRootPart" then
 				hrp = b
 			end
@@ -390,7 +390,7 @@ function createViewport(templates)
 end
 
 function noticeConnectionUnit()
-	for _, b in next, clientConfig._connections.notice do
+	for _, b in pairs(clientConfig._connections.notice) do
 		if typeof(b) == "RBXScriptConnection" then
 			b:Disconnect()
 			b = nil
@@ -411,7 +411,7 @@ local function newNotice(noticeText)
 end
 
 function advConnectionUnit()
-	for _, b in next, clientConfig._connections.advancedView do
+	for _, b in pairs(clientConfig._connections.advancedView) do
 		if typeof(b) == "RBXScriptConnection" then
 			b:Disconnect()
 			b = nil
@@ -473,7 +473,7 @@ function advConnectionUnit()
 end
 
 function mainConnectionUnit(shirtObject, pantObject)
-	for _, b in next, clientConfig._connections.terminal do
+	for _, b in pairs(clientConfig._connections.terminal) do
 		if typeof(b) == "RBXScriptConnection" then
 			b:Disconnect()
 			b = nil
@@ -619,10 +619,6 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 			local templateTable = Data[3]
 			local characterModel = Data[4]
 			local characterPi = getPi(characterModel)
-			local charTemplateTable = Templates.New(
-				Player.Character.Shirt.ShirtTemplate:match("%d+"),
-				Player.Character.Pants.PantsTemplate:match("%d+")
-			)
 			local infoShirt, infoPant
 
 			onCancel(loadingState)
