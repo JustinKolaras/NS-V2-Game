@@ -1,14 +1,18 @@
+--- @class Util
+---
+--- Holds all utility functions.
+
 local Util = {}
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Promise = require(ReplicatedStorage.Shared.Promise)
 
 --[=[
-    Recursively looks through the ancestors of 'Current' until 'Ancestor' is found.
+	Recursively looks through the ancestors of 'Current' until 'Ancestor' is found.
 
-    @param Ancestor Instance -- The ancestor you want to look for
-    @param Current Instance -- The current instance you want to start with
-    @return Instance
+	@param Ancestor Instance -- The ancestor you want to look for
+	@param Current Instance -- The current instance you want to start with
+	@return Instance
 ]=]
 function Util:FindAbsoluteAncestor(Ancestor: Instance, Current: Instance): (Instance?)
 	local toReturn
@@ -29,13 +33,13 @@ function Util:FindAbsoluteAncestor(Ancestor: Instance, Current: Instance): (Inst
 end
 
 --[=[
-    Uses the Promise library to wait for a child of a specific class.
-    If after the timeout (in seconds), there is still no valid child, this function will cancel and resolve.
+	Uses the Promise library to wait for a child of a specific class.
+	If after the timeout (in seconds), there is still no valid child, this function will cancel and resolve.
 
-    @param Parent Instance -- The parent of which is looking for a child
-    @param Class string -- The class of the child you want to retrieve
+	@param Parent Instance -- The parent of which is looking for a child
+	@param Class string -- The class of the child you want to retrieve
 	@param Timeout number -- The timeout, in seconds, of this function to automatically resolve
-    @return Promise<Instance>
+	@return Promise<Instance>
 ]=]
 function Util:WaitForChildOfClass(Parent: Instance, Class: string, Timeout: number)
 	return Promise.new(function(resolve)
@@ -69,14 +73,14 @@ function Util:WaitForChildOfClass(Parent: Instance, Class: string, Timeout: numb
 end
 
 --[=[
-    Uses the Promise library to wait for a child to receive a new parent.
+	Uses the Promise library to wait for a child to receive a new parent.
 	If a parent is provided, this function will only return a result if the new parent matches such.
-    If after the timeout (in seconds), there is still no valid parent, this function will cancel and resolve.
+	If after the timeout (in seconds), there is still no valid parent, this function will cancel and resolve.
 
-    @param Object Instance -- The object to receive a new parent
-    @param Timeout number -- The timeout, in seconds, of this function to automatically resolve
+	@param Object Instance -- The object to receive a new parent
+	@param Timeout number -- The timeout, in seconds, of this function to automatically resolve
 	@param Parent? Instance -- The optional parent object to validate before resolving
-    @return Promise<Instance>
+	@return Promise<Instance>
 ]=]
 function Util:WaitForNewParent(Object: Instance, Timeout: number, Parent: Instance?)
 	return Promise.new(function(resolve)
@@ -112,9 +116,9 @@ end
 --[=[
 	Creates an instance with the provided properties.
 
-    @param Object string -- The class of the object to create
-    @param Properties dict -- Key-value pair table representing k as the property and v as the value
-    @return Instance
+	@param Object string -- The class of the object to create
+	@param Properties dict -- Key-value pair table representing k as the property and v as the value
+	@return Instance
 ]=]
 function Util:Create(Object: string, Properties: { [string]: any }?): (Instance)
 	local toReturn = Instance.new(Object)
@@ -129,14 +133,14 @@ end
 --[=[
 	Clones an instance with the provided properties.
 
-    @param Object Instance -- The object to clone from
-    @param Properties dict -- Key-value pair table representing k as the property and v as the value
-    @return Instance
+	@param Object Instance -- The object to clone from
+	@param Properties dict -- Key-value pair table representing k as the property and v as the value
+	@return Instance
 ]=]
 function Util:Clone(Object: Instance, Properties: { [string]: any }?): (Instance)
 	local toReturn = Object:Clone()
 	if Properties then
-		for a, b in next, Properties do
+		for a, b in pairs(Properties) do
 			toReturn[a] = b
 		end
 	end
@@ -147,13 +151,13 @@ end
 	Moves children from Previous to Next.
 	If shouldDelete is true, Previous will be destroyed after the conversion has been made.
 
-    @param Previous Instance -- The instance to move children from
+	@param Previous Instance -- The instance to move children from
 	@param Next Instance -- The instance to move children to
 	@param shouldDelete? boolean -- Specifies if Previous should be deleted after the conversion
-    @return void
+	@return void
 ]=]
 function Util:MoveChildren(Previous: Instance, Next: Instance, shouldDelete: boolean?): ()
-	for _, b in next, Previous:GetChildren() do
+	for _, b in ipairs(Previous:GetChildren()) do
 		b.Parent = Next
 	end
 	if shouldDelete then

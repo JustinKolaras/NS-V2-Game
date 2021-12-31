@@ -7,9 +7,9 @@ local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 local LINE_HEIGHT = 20
 local WINDOW_MAX_HEIGHT = 300
-local MOUSE_TOUCH_ENUM = {Enum.UserInputType.MouseButton1, Enum.UserInputType.MouseButton2, Enum.UserInputType.Touch}
+local MOUSE_TOUCH_ENUM = { Enum.UserInputType.MouseButton1, Enum.UserInputType.MouseButton2, Enum.UserInputType.Touch }
 
---- Window handles the command bar GUI
+-- Window handles the command bar GUI
 local Window = {
 	Valid = true,
 	AutoComplete = nil,
@@ -25,19 +25,19 @@ local Entry = Gui:WaitForChild("Entry")
 
 Line.Parent = nil
 
---- Update the text entry label
+-- Update the text entry label
 function Window:UpdateLabel()
 	Entry.TextLabel.Text = Player.Name .. "@" .. self.Cmdr.PlaceName .. "$"
 	Entry.TextLabel.Size = UDim2.new(0, Entry.TextLabel.TextBounds.X, 0, 20)
 	Entry.TextBox.Position = UDim2.new(0, Entry.TextLabel.Size.X.Offset + 7, 0, 0)
 end
 
---- Get the text entry label
+-- Get the text entry label
 function Window:GetLabel()
 	return Entry.TextLabel.Text
 end
 
---- Recalculate the window height
+-- Recalculate the window height
 function Window:UpdateWindowHeight()
 	local windowHeight = LINE_HEIGHT
 
@@ -48,8 +48,7 @@ function Window:UpdateWindowHeight()
 	end
 
 	Gui.CanvasSize = UDim2.new(Gui.CanvasSize.X.Scale, Gui.CanvasSize.X.Offset, 0, windowHeight)
-	Gui.Size =
-		UDim2.new(
+	Gui.Size = UDim2.new(
 		Gui.Size.X.Scale,
 		Gui.Size.X.Offset,
 		0,
@@ -59,7 +58,7 @@ function Window:UpdateWindowHeight()
 	Gui.CanvasPosition = Vector2.new(0, math.clamp(windowHeight - 300, 0, math.huge))
 end
 
---- Add a line to the command bar
+-- Add a line to the command bar
 function Window:AddLine(text, color)
 	text = tostring(text)
 
@@ -70,8 +69,7 @@ function Window:AddLine(text, color)
 
 	local str = self.Cmdr.Util.EmulateTabstops(text or "nil", 8)
 	local line = Line:Clone()
-	line.Size =
-		UDim2.new(
+	line.Size = UDim2.new(
 		line.Size.X.Scale,
 		line.Size.X.Offset,
 		0,
@@ -87,12 +85,12 @@ function Window:AddLine(text, color)
 	line.Parent = Gui
 end
 
---- Returns if the command bar is visible
+-- Returns if the command bar is visible
 function Window:IsVisible()
 	return Gui.Visible
 end
 
---- Sets the command bar visible or not
+-- Sets the command bar visible or not
 function Window:SetVisible(visible)
 	Gui.Visible = visible
 
@@ -115,17 +113,17 @@ function Window:SetVisible(visible)
 	end
 end
 
---- Hides the command bar
+-- Hides the command bar
 function Window:Hide()
 	return self:SetVisible(false)
 end
 
---- Shows the command bar
+-- Shows the command bar
 function Window:Show()
 	return self:SetVisible(true)
 end
 
---- Sets the text in the command bar text box, and captures focus
+-- Sets the text in the command bar text box, and captures focus
 function Window:SetEntryText(text)
 	Entry.TextBox.Text = text
 
@@ -135,12 +133,12 @@ function Window:SetEntryText(text)
 	end
 end
 
---- Gets the text in the command bar text box
+-- Gets the text in the command bar text box
 function Window:GetEntryText()
 	return Entry.TextBox.Text:gsub("\t", "")
 end
 
---- Sets whether the command is in a valid state or not.
+-- Sets whether the command is in a valid state or not.
 -- Cannot submit if in invalid state.
 function Window:SetIsValidInput(isValid, errorText)
 	Entry.TextBox.TextColor3 = isValid and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(255, 73, 73)
@@ -152,7 +150,7 @@ function Window:HideInvalidState()
 	Entry.TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 end
 
---- Event handler for text box focus lost
+-- Event handler for text box focus lost
 function Window:LoseFocus(submit)
 	local text = Entry.TextBox.Text
 
@@ -179,16 +177,15 @@ function Window:TraverseHistory(delta)
 
 	if self.HistoryState == nil then
 		self.HistoryState = {
-			Position = #history + 1;
-			InitialText = self:GetEntryText();
+			Position = #history + 1,
+			InitialText = self:GetEntryText(),
 		}
 	end
 
 	self.HistoryState.Position = math.clamp(self.HistoryState.Position + delta, 1, #history + 1)
 
 	self:SetEntryText(
-		self.HistoryState.Position == #history + 1
-			and self.HistoryState.InitialText
+		self.HistoryState.Position == #history + 1 and self.HistoryState.InitialText
 			or history[self.HistoryState.Position]
 	)
 end
@@ -207,7 +204,7 @@ end
 
 local lastPressTime = 0
 local pressCount = 0
---- Handles user input when the box is focused
+-- Handles user input when the box is focused
 function Window:BeginInput(input, gameProcessed)
 	if GuiService.MenuIsOpen then
 		self:Hide()
@@ -277,7 +274,8 @@ function Window:BeginInput(input, gameProcessed)
 				local lastArg = self.AutoComplete.Arg
 
 				newText = command.Alias
-				insertSpace = self.AutoComplete.NumArgs ~= #command.ArgumentDefinitions and self.AutoComplete.IsPartial == false
+				insertSpace = self.AutoComplete.NumArgs ~= #command.ArgumentDefinitions
+					and self.AutoComplete.IsPartial == false
 
 				local args = command.Arguments
 				for i = 1, #args do
@@ -318,29 +316,23 @@ function Window:BeginInput(input, gameProcessed)
 end
 
 -- Hook events
-Entry.TextBox.FocusLost:Connect(
-	function(submit)
-		return Window:LoseFocus(submit)
-	end
-)
+Entry.TextBox.FocusLost:Connect(function(submit)
+	return Window:LoseFocus(submit)
+end)
 
-UserInputService.InputBegan:Connect(
-	function(input, gameProcessed)
-		return Window:BeginInput(input, gameProcessed)
-	end
-)
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	return Window:BeginInput(input, gameProcessed)
+end)
 
-Entry.TextBox:GetPropertyChangedSignal("Text"):Connect(
-	function()
-		if Entry.TextBox.Text:match("\t") then -- Eat \t
-			Entry.TextBox.Text = Entry.TextBox.Text:gsub("\t", "")
-			return
-		end
-		if Window.OnTextChanged then
-			return Window.OnTextChanged(Entry.TextBox.Text)
-		end
+Entry.TextBox:GetPropertyChangedSignal("Text"):Connect(function()
+	if Entry.TextBox.Text:match("\t") then -- Eat \t
+		Entry.TextBox.Text = Entry.TextBox.Text:gsub("\t", "")
+		return
 	end
-)
+	if Window.OnTextChanged then
+		return Window.OnTextChanged(Entry.TextBox.Text)
+	end
+end)
 
 Gui.ChildAdded:Connect(Window.UpdateWindowHeight)
 

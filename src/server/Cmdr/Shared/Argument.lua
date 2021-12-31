@@ -1,7 +1,7 @@
 local Util = require(script.Parent.Util)
 
 local function unescapeOperators(text)
-	for _, operator in ipairs({"%.", "%?", "%*", "%*%*"}) do
+	for _, operator in ipairs({ "%.", "%?", "%*", "%*%*" }) do
 		text = text:gsub("\\" .. operator, operator:gsub("%%", ""))
 	end
 
@@ -11,21 +11,21 @@ end
 local Argument = {}
 Argument.__index = Argument
 
---- Returns a new ArgumentContext, an object that handles parsing and validating arguments
-function Argument.new (command, argumentObject, value)
+-- Returns a new ArgumentContext, an object that handles parsing and validating arguments
+function Argument.new(command, argumentObject, value)
 	local self = {
-		Command = command; -- The command that owns this argument
-		Type = nil; -- The type definition
-		Name = argumentObject.Name; -- The name for this specific argument
-		Object = argumentObject; -- The raw ArgumentObject (definition)
-		Required = argumentObject.Default == nil and argumentObject.Optional ~= true; -- If the argument is required or not.
-		Executor = command.Executor; -- The player who is running the command
-		RawValue = value; -- The raw, unparsed value
-		RawSegments = {}; -- The raw, unparsed segments (if the raw value was comma-sep)
-		TransformedValues = {}; -- The transformed value (generated later)
-		Prefix = ""; -- The prefix for this command (%Team)
-		TextSegmentInProgress = ""; -- The text of the raw segment the user is currently typing.
-		RawSegmentsAreAutocomplete = false;
+		Command = command, -- The command that owns this argument
+		Type = nil, -- The type definition
+		Name = argumentObject.Name, -- The name for this specific argument
+		Object = argumentObject, -- The raw ArgumentObject (definition)
+		Required = argumentObject.Default == nil and argumentObject.Optional ~= true, -- If the argument is required or not.
+		Executor = command.Executor, -- The player who is running the command
+		RawValue = value, -- The raw, unparsed value
+		RawSegments = {}, -- The raw, unparsed segments (if the raw value was comma-sep)
+		TransformedValues = {}, -- The transformed value (generated later)
+		Prefix = "", -- The prefix for this command (%Team)
+		TextSegmentInProgress = "", -- The text of the raw segment the user is currently typing.
+		RawSegmentsAreAutocomplete = false,
 	}
 
 	if type(argumentObject.Type) == "table" then
@@ -63,7 +63,7 @@ function Argument:GetDefaultAutocomplete()
 	return {}
 end
 
---- Calls the transform function on this argument.
+-- Calls the transform function on this argument.
 -- The return value(s) from this function are passed to all of the other argument methods.
 -- Called automatically at instantiation
 function Argument:Transform()
@@ -85,7 +85,6 @@ function Argument:Transform()
 			rawValue = strings[math.random(1, #strings)]
 			self.RawSegmentsAreAutocomplete = true
 		end
-
 	end
 
 	if self.Type.Listable and #self.RawValue > 0 then
@@ -120,10 +119,7 @@ function Argument:Transform()
 					end
 				end
 
-				rawValue = table.concat(
-					strings,
-					","
-				)
+				rawValue = table.concat(strings, ",")
 				self.RawSegmentsAreAutocomplete = true
 			end
 		end
@@ -133,7 +129,7 @@ function Argument:Transform()
 		local rawSegments = Util.SplitStringSimple(rawValue, ",")
 
 		if #rawSegments == 0 then
-			rawSegments = {""}
+			rawSegments = { "" }
 		end
 
 		if rawValue:sub(#rawValue, #rawValue) == "," then
@@ -163,12 +159,12 @@ function Argument:TransformSegment(rawSegment)
 	end
 end
 
---- Returns whatever the Transform method gave us.
+-- Returns whatever the Transform method gave us.
 function Argument:GetTransformedValue(segment)
 	return unpack(self.TransformedValues[segment])
 end
 
---- Validates that the argument will work without any type errors.
+-- Validates that the argument will work without any type errors.
 function Argument:Validate(isFinal)
 	if self.RawValue == nil or #self.RawValue == 0 and self.Required == false then
 		return true
@@ -203,7 +199,7 @@ function Argument:Validate(isFinal)
 	end
 end
 
---- Gets a list of all possible values that could match based on the current value.
+-- Gets a list of all possible values that could match based on the current value.
 function Argument:GetAutocomplete()
 	if self.Type.Autocomplete then
 		return self.Type.Autocomplete(self:GetTransformedValue(#self.TransformedValues))
@@ -220,7 +216,7 @@ function Argument:ParseValue(i)
 	end
 end
 
---- Returns the final value of the argument.
+-- Returns the final value of the argument.
 function Argument:GetValue()
 	if #self.RawValue == 0 and not self.Required and self.Object.Default ~= nil then
 		return self.Object.Default
