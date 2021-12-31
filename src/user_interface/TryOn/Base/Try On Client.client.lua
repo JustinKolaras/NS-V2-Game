@@ -132,7 +132,7 @@ local clientConfig = setmetatable({
 
 local function makeLibraryMeta(Name: string): ({ [string]: func })
 	return {
-		__index = function(_, indx)
+		__index = function(_, indx: string)
 			error(
 				("Try On Client::inBuiltLibraryError: %s is not a function of %s.\n\n%s"):format(
 					indx,
