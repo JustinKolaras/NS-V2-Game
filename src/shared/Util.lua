@@ -152,7 +152,7 @@ end
 	@param shouldDelete? boolean -- Specifies if Previous should be deleted after the conversion
     @return void
 ]=]
-function Util:MoveChildren(Previous: Instance, Next: Instance, shouldDelete: boolean?): (nil)
+function Util:MoveChildren(Previous: Instance, Next: Instance, shouldDelete: boolean?): ()
 	for _, b in next, Previous:GetChildren() do
 		b.Parent = Next
 	end
