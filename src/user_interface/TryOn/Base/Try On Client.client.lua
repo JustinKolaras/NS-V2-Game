@@ -54,6 +54,8 @@ local Event = TryOnFolder:FindFirstChild("TryOn Event")
 local Function = TryOnFolder:FindFirstChild("TryOn Function")
 local viewportCharacter = TryOnFolder:FindFirstChild("Character")
 
+type func = (...any) -> (...any)
+
 local clientConfig = setmetatable({
 	key = 0,
 	templatePrefix = "http://www.roblox.com/asset/?id=%d",
@@ -111,7 +113,7 @@ local clientConfig = setmetatable({
 	loadingTimes = {},
 	archivedLoads = {},
 }, {
-	__index = function(_, indx)
+	__index = function(_, indx: string)
 		error(
 			(
 				"Try On Client::clientConfigError: Attempt to get clientConfig value with a nil index. -> clientConfig[%s]?\n\n%s"
@@ -119,7 +121,7 @@ local clientConfig = setmetatable({
 		)
 	end,
 
-	__newindex = function(_, indx, val)
+	__newindex = function(_, indx: string, val: any)
 		error(
 			(
 				"Try On Client::clientConfigError: New items are disallowed! -> Operation (clientConfig[%s] = %s) failed.\n\n%s"
@@ -128,8 +130,7 @@ local clientConfig = setmetatable({
 	end,
 })
 
-local function makeLibraryMeta(Name)
-	assert(Name and typeof(Name) == "string", "makeLibraryMeta: Parameter 1 (Name) string expected")
+local function makeLibraryMeta(Name: string): ({ [string]: func })
 	return {
 		__index = function(_, indx)
 			error(
@@ -147,11 +148,11 @@ local Time = setmetatable({}, makeLibraryMeta("Time"))
 local Templates = setmetatable({}, makeLibraryMeta("Templates"))
 local Core = setmetatable({}, makeLibraryMeta("Core"))
 
-function Time.Set()
+function Time.Set(): ()
 	table.insert(clientConfig.loadingTimes, 1, os.clock())
 end
 
-function Time.Get()
+function Time.Get(): (number)
 	local loadingTimes = clientConfig.loadingTimes
 	local archivedLoads = clientConfig.archivedLoads
 
@@ -163,20 +164,19 @@ function Time.Get()
 	return tonumber(toReturn)
 end
 
-function Time.Forget()
+function Time.Forget(): ()
 	table.remove(clientConfig.loadingTimes, 1)
 end
 
-function Templates.New(Shirt, Pant)
+function Templates.New(Shirt: number, Pant: number): ({ [string]: number })
 	return {
 		TemplateS = Shirt,
 		TemplateP = Pant,
 	}
 end
 
-function Core.elements(Toggle)
+function Core.elements(Toggle: boolean): ()
 	local ok, _, timeout = nil, nil, 0
-	assert(typeof(Toggle) == "boolean", "core.elements: Parameter 1 (Toggle) bool expected")
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, Toggle)
 	local function ResetButtonCallback()
 		StarterGui:SetCore("ResetButtonCallback", Toggle)
@@ -190,30 +190,31 @@ function Core.elements(Toggle)
 	end
 end
 
-local function fireServer(...)
+local function fireServer(...: any): ()
 	Event:FireServer(clientConfig.key, ...)
 end
 
-local function tryOn(...)
+local function tryOn(...: number): ()
 	AdvTriggFrame.Visible = true
 	TryOn.Text = "Take Off Outfit"
 	clientConfig.isTryingOn = true
 	fireServer("TryOn", ...)
 end
 
-local function takeOff()
+local function takeOff(): ()
 	fireServer("TakeOff")
 	TryOn.Text = "Try On Outfit"
 	clientConfig.isTryingOn = false
 end
 
-local function getPi(mannequinModel)
-	local value = mannequinModel:GetAttribute("PI")
+local function getPi(mannequin: Model): (string)
+	local value = mannequin:GetAttribute("PI")
 	assert(value, "getPi: No personal identification value")
+	value = tostring(value)
 	return value
 end
 
-local function checkAsset(Proto, ...)
+local function checkAsset(Proto: boolean, ...: number)
 	local Data = { ... }
 	return Promise.new(function(resolve)
 		for a, b in ipairs(Data) do
@@ -236,7 +237,7 @@ local function checkAsset(Proto, ...)
 	end)
 end
 
-local function productInfo(id, enum)
+local function productInfo(id: number, enum: Enum)
 	assert(enum.EnumType == Enum.InfoType, "productInfo: Parameter 2 (enum) InfoType Enumerator expected")
 	return Promise.new(function(resolve, reject)
 		local succ, result = pcall(Market.GetProductInfo, Market, id, enum)
@@ -244,7 +245,7 @@ local function productInfo(id, enum)
 	end)
 end
 
-local function manageIndividuals(toTop)
+local function manageIndividuals(toTop: boolean): ()
 	if toTop then
 		BuyShirt.Position = UDim2.fromScale(BuyShirt.Position.X.Scale, clientConfig.tryOnObjectYScale)
 		BuyPant.Position = UDim2.fromScale(BuyPant.Position.X.Scale, clientConfig.tryOnObjectYScale)
@@ -254,7 +255,7 @@ local function manageIndividuals(toTop)
 	end
 end
 
-local function manageButtons(outfitVisible, tryOnVisible)
+local function manageButtons(outfitVisible: boolean, tryOnVisible: boolean): ()
 	local exception = false
 	if outfitVisible then
 		BuyOutfit.Visible = true
@@ -280,11 +281,11 @@ local function manageButtons(outfitVisible, tryOnVisible)
 	end
 end
 
-local function stillActivated()
+local function stillActivated(): (boolean)
 	return (BuyShirt.Visible and BuyPant.Visible)
 end
 
-local function loadingState(customText)
+local function loadingState(customText: string?): ()
 	BuyOutfit.Visible = false
 	BuyPant.Visible = false
 	BuyShirt.Visible = false
@@ -293,13 +294,13 @@ local function loadingState(customText)
 	Loading.Text = customText or clientConfig.loadText
 end
 
-local function cancelLoading()
+local function cancelLoading(): ()
 	local loadPromise = clientConfig._promise.mainLoad
 	loadPromise:cancel()
 	loadPromise = nil
 end
 
-local function close(Key, Type)
+local function close(Key: string, Type: number): ()
 	if Key == "Base" then
 		local vpChar = clientConfig.storedViewport
 
@@ -326,7 +327,7 @@ local function close(Key, Type)
 	end
 end
 
-local function err(info, text)
+local function err(info: string, text: string?): ()
 	Time.Forget()
 	ErrorNotif.Visible = true
 	warn(info)
@@ -337,12 +338,11 @@ local function err(info, text)
 	end
 end
 
-local function isOwned(indivButton)
-	assert(indivButton:IsA("TextButton"), "isOwned: Parameter 1 (indivButton) TextButton expected")
+local function isOwned(indivButton: TextButton): (boolean)
 	return indivButton.Text:lower():match("owned")
 end
 
-local function disconnect(Client)
+local function disconnect(Client: Player): ()
 	if Client.UserId == Player.UserId then
 		for _, outermost in pairs(clientConfig._connections) do
 			if typeof(outermost) == "table" then -- Not expecting to loop multiple tables, so we'll loop here
@@ -360,7 +360,7 @@ local function disconnect(Client)
 	end
 end
 
-function createViewport(templates)
+function createViewport(templates: { [string]: number })
 	return Promise.new(function(resolve)
 		Viewport:ClearAllChildren()
 
@@ -409,7 +409,7 @@ function noticeConnectionUnit()
 	end)
 end
 
-local function newNotice(noticeText)
+local function newNotice(noticeText: string): ()
 	noticeConnectionUnit():catch(error):await()
 	NoticeDesc.Text = noticeText
 	Notice.Visible = true
@@ -477,7 +477,7 @@ function advConnectionUnit()
 	end)
 end
 
-function mainConnectionUnit(shirtObject, pantObject)
+function mainConnectionUnit(shirtObject: number, pantObject: number)
 	for _, b in pairs(clientConfig._connections.terminal) do
 		if typeof(b) == "RBXScriptConnection" then
 			b:Disconnect()
@@ -612,7 +612,7 @@ function mainConnectionUnit(shirtObject, pantObject)
 	end)
 end
 
-clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key, ...)
+clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key: string, ...: any)
 	local Data = { ... }
 	if Key == "Open" then
 		clientConfig._promise.mainLoad = Promise.new(function(_, _, onCancel)
@@ -645,14 +645,14 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 			Time.Set()
 
 			productInfo(shirt, Enum.InfoType.Asset)
-				:andThen(function(result)
+				:andThen(function(result: { [string]: any })
 					infoShirt = result
 				end)
 				:catch(error)
 				:await()
 
 			productInfo(pant, Enum.InfoType.Asset)
-				:andThen(function(result)
+				:andThen(function(result: { [string]: any })
 					infoPant = result
 				end)
 				:catch(error)
@@ -669,7 +669,7 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 			mainConnectionUnit(shirt, pant):catch(error):await()
 
 			checkAsset(true, shirt)
-				:andThen(function(Type)
+				:andThen(function(Type: number)
 					if Type == 1 then
 						BuyShirt.Text = clientConfig.ownedFormat
 						BuyShirt.AutoButtonColor = false
@@ -683,7 +683,7 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 				:await()
 
 			checkAsset(true, pant)
-				:andThen(function(Type)
+				:andThen(function(Type: number)
 					if Type == 1 then
 						BuyPant.Text = clientConfig.ownedFormat
 						BuyPant.AutoButtonColor = false
@@ -716,13 +716,13 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 	end
 end)
 
-Function.OnClientInvoke = function(Key)
+Function.OnClientInvoke = function(Key: string)
 	if Key == "MouseTarget" then
 		return Player:GetMouse().Target
 	end
 end
 
-Util:WaitForChildOfClass(Player.Character, "Humanoid", 2):andThen(function(result)
+Util:WaitForChildOfClass(Player.Character, "Humanoid", 2):andThen(function(result: Humanoid | nil)
 	if result then
 		clientConfig._connections.died = result.Died:Connect(function()
 			if Base.Visible then

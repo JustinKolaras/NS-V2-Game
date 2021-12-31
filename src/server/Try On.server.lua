@@ -205,7 +205,7 @@ Players.PlayerAdded:Connect(function(Player: Player)
 
 	Util
 		:WaitForChildOfClass(Character, "Shirt", 1)
-		:andThen(function(result)
+		:andThen(function(result: Shirt | nil)
 			if not result then
 				Util:Create("Shirt", { ShirtTemplate = serverConfig.templatePrefix:format("0"), Parent = Character })
 			end
@@ -214,7 +214,7 @@ Players.PlayerAdded:Connect(function(Player: Player)
 		:await()
 	Util
 		:WaitForChildOfClass(Character, "Pants", 1)
-		:andThen(function(result)
+		:andThen(function(result: Pants | nil)
 			if not result then
 				Util:Create("Pants", { PantsTemplate = serverConfig.templatePrefix:format("0"), Parent = Character })
 			end
