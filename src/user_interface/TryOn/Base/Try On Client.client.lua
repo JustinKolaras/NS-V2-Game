@@ -121,11 +121,9 @@ local clientConfig = setmetatable({
 
 	__newindex = function(_, indx, val)
 		error(
-			("Try On Client::clientConfigError: New items are disallowed! -> Operation (clientConfig[%s] = %s) failed.\n\n%s"):format(
-				indx, 
-				tostring(val), 
-				debug.traceback()
-			)
+			(
+				"Try On Client::clientConfigError: New items are disallowed! -> Operation (clientConfig[%s] = %s) failed.\n\n%s"
+			):format(indx, tostring(val), debug.traceback())
 		)
 	end,
 })
@@ -135,7 +133,11 @@ local function makeLibraryMeta(Name)
 	return {
 		__index = function(_, indx)
 			error(
-				("Try On Client::inBuiltLibraryError: %s is not a function of %s.\n\n%s"):format(indx, Name, debug.traceback())
+				("Try On Client::inBuiltLibraryError: %s is not a function of %s.\n\n%s"):format(
+					indx,
+					Name,
+					debug.traceback()
+				)
 			)
 		end,
 	}

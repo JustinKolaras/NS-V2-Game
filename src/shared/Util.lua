@@ -1,4 +1,4 @@
-local util = {}
+local Util = {}
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Promise = require(ReplicatedStorage.Shared.Promise)
@@ -8,9 +8,9 @@ local Promise = require(ReplicatedStorage.Shared.Promise)
 
     @param Ancestor Instance -- The ancestor you want to look for
     @param Current Instance -- The current instance you want to start with
-    @return Instance -- Returns the ancestor
+    @return Instance
 ]=]
-function util:FindAbsoluteAncestor(Ancestor, Current)
+function Util:FindAbsoluteAncestor(Ancestor: Instance, Current: Instance): (Instance | nil)
 	local toReturn
 	repeat
 		if toReturn and toReturn.Parent == nil then
@@ -33,11 +33,11 @@ end
     If after the timeout (in seconds), there is still no valid child, this function will cancel and resolve.
 
     @param Parent Instance -- The parent of which is looking for a child
-    @param Class Class -- The class of the child you want to retrieve
-	@param Timeout Number -- The timeout, in seconds, of this function to automatically resolve
-    @return Promise<Instance> -- Returns the ancestor
+    @param Class string -- The class of the child you want to retrieve
+	@param Timeout number -- The timeout, in seconds, of this function to automatically resolve
+    @return Promise<Instance>
 ]=]
-function util:WaitForChildOfClass(Parent, Class, Timeout)
+function Util:WaitForChildOfClass(Parent: Instance, Class: string, Timeout: number)
 	return Promise.new(function(resolve)
 		local temp
 		local disregard
@@ -74,11 +74,11 @@ end
     If after the timeout (in seconds), there is still no valid parent, this function will cancel and resolve.
 
     @param Object Instance -- The object to receive a new parent
-    @param Timeout Number -- The timeout, in seconds, of this function to automatically resolve
+    @param Timeout number -- The timeout, in seconds, of this function to automatically resolve
 	@param Parent? Instance -- The optional parent object to validate before resolving
-    @return Promise<Instance> -- Returns the object
+    @return Promise<Instance>
 ]=]
-function util:WaitForNewParent(Object, Timeout, Parent)
+function Util:WaitForNewParent(Object: Instance, Timeout: number, Parent: Instance?)
 	return Promise.new(function(resolve)
 		local temp
 		local disregard
@@ -112,14 +112,14 @@ end
 --[=[
 	Creates an instance with the provided properties.
 
-    @param Object Class -- The class of the object to create
-    @param Properties Table -- Key-value pair table representing k as the property and v as the value
-    @return Instance -- Returns the object created
+    @param Object string -- The class of the object to create
+    @param Properties dict -- Key-value pair table representing k as the property and v as the value
+    @return Instance
 ]=]
-function util:Create(Object, Properties)
+function Util:Create(Object: string, Properties: { [any]: any }): (Instance)
 	local toReturn = Instance.new(Object)
 	if Properties then
-		for a, b in next, Properties do
+		for a, b in pairs(Properties) do
 			toReturn[a] = b
 		end
 	end
@@ -130,10 +130,10 @@ end
 	Clones an instance with the provided properties.
 
     @param Object Instance -- The object to clone from
-    @param Properties Table -- Key-value pair table representing k as the property and v as the value
-    @return Instance -- Returns the cloned object
+    @param Properties dict -- Key-value pair table representing k as the property and v as the value
+    @return Instance
 ]=]
-function util:Clone(Object, Properties)
+function Util:Clone(Object: Instance, Properties: { [any]: any }): (Instance)
 	local toReturn = Object:Clone()
 	if Properties then
 		for a, b in next, Properties do
@@ -149,10 +149,10 @@ end
 
     @param Previous Instance -- The instance to move children from
 	@param Next Instance -- The instance to move children to
-	@param shouldDelete? Boolean -- Specifies if Previous should be deleted after the conversion
+	@param shouldDelete? boolean -- Specifies if Previous should be deleted after the conversion
     @return void
 ]=]
-function util:MoveChildren(Previous, Next, shouldDelete)
+function Util:MoveChildren(Previous: Instance, Next: Instance, shouldDelete: boolean?): (nil)
 	for _, b in next, Previous:GetChildren() do
 		b.Parent = Next
 	end
@@ -161,4 +161,4 @@ function util:MoveChildren(Previous, Next, shouldDelete)
 	end
 end
 
-return util
+return Util
