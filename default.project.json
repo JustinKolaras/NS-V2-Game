@@ -2,25 +2,21 @@
     "name": "NS V2",
     "tree": {
         "$className": "DataModel",
-
         "ReplicatedStorage": {
             "Shared": {
                 "$path": "src/shared"
             }
         },
-
         "ServerScriptService": {
             "Server": {
                 "$path": "src/server"
             }
         },
-
         "ServerStorage": {
             "Storage": {
                 "$path": "src/storage"
             }
         },
-
         "StarterPlayer": {
             "StarterPlayerScripts": {
                 "Client": {
@@ -33,17 +29,14 @@
                 }
             }
         },
-
         "StarterPack": {
             "$className": "StarterPack",
             "$path": "src/backpack"
         },
-
         "StarterGui": {
             "$className": "StarterGui",
             "$path": "src/user_interface"
         },
-
         "Workspace": {
             "$properties": {
                 "FilteringEnabled": true
