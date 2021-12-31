@@ -116,7 +116,7 @@ end
     @param Properties dict -- Key-value pair table representing k as the property and v as the value
     @return Instance
 ]=]
-function Util:Create(Object: string, Properties: { [any]: any }): (Instance)
+function Util:Create(Object: string, Properties: { [string]: any }): (Instance)
 	local toReturn = Instance.new(Object)
 	if Properties then
 		for a, b in pairs(Properties) do
@@ -133,7 +133,7 @@ end
     @param Properties dict -- Key-value pair table representing k as the property and v as the value
     @return Instance
 ]=]
-function Util:Clone(Object: Instance, Properties: { [any]: any }): (Instance)
+function Util:Clone(Object: Instance, Properties: { [string]: any }): (Instance)
 	local toReturn = Object:Clone()
 	if Properties then
 		for a, b in next, Properties do
