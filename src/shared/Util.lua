@@ -10,7 +10,7 @@ local Promise = require(ReplicatedStorage.Shared.Promise)
     @param Current Instance -- The current instance you want to start with
     @return Instance
 ]=]
-function Util:FindAbsoluteAncestor(Ancestor: Instance, Current: Instance): (Instance | nil)
+function Util:FindAbsoluteAncestor(Ancestor: Instance, Current: Instance): (Instance?)
 	local toReturn
 	repeat
 		if toReturn and toReturn.Parent == nil then

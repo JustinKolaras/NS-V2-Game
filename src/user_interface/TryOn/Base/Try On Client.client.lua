@@ -237,7 +237,7 @@ local function checkAsset(Proto: boolean, ...: number)
 	end)
 end
 
-local function productInfo(id: number, enum: Enum)
+local function productInfo(id: number, enum: any) -- don't think there is a type for enum references
 	assert(enum.EnumType == Enum.InfoType, "productInfo: Parameter 2 (enum) InfoType Enumerator expected")
 	return Promise.new(function(resolve, reject)
 		local succ, result = pcall(Market.GetProductInfo, Market, id, enum)
@@ -300,7 +300,7 @@ local function cancelLoading(): ()
 	loadPromise = nil
 end
 
-local function close(Key: string, Type: number): ()
+local function close(Key: string, Type: number?): ()
 	if Key == "Base" then
 		local vpChar = clientConfig.storedViewport
 
@@ -338,14 +338,16 @@ local function err(info: string, text: string?): ()
 	end
 end
 
-local function isOwned(indivButton: TextButton): (boolean)
+local function isOwned(
+	indivButton: TextButton
+): (string?) -- not a bool. returns a string if passed, and string is a truthy val
 	return indivButton.Text:lower():match("owned")
 end
 
 local function disconnect(Client: Player): ()
 	if Client.UserId == Player.UserId then
 		for _, outermost in pairs(clientConfig._connections) do
-			if typeof(outermost) == "table" then -- Not expecting to loop multiple tables, so we'll loop here
+			if typeof(outermost) == "table" then -- Not expecting to see more tables, so we'll loop here
 				for _, innermost in pairs(outermost) do
 					if typeof(innermost) == "RBXScriptConnection" then
 						pcall(innermost.Disconnect, innermost)
@@ -722,7 +724,7 @@ Function.OnClientInvoke = function(Key: string)
 	end
 end
 
-Util:WaitForChildOfClass(Player.Character, "Humanoid", 2):andThen(function(result: Humanoid | nil)
+Util:WaitForChildOfClass(Player.Character, "Humanoid", 2):andThen(function(result: Humanoid?)
 	if result then
 		clientConfig._connections.died = result.Died:Connect(function()
 			if Base.Visible then

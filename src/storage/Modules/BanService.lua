@@ -81,7 +81,7 @@ end
 
 --
 
-function banService:Add(Id: number, Executor: number, Reason: string | number): (string | nil)
+function banService:Add(Id: number, Executor: number, Reason: string | number): (string?)
 	local _, Err = pcall(BanStore.SetAsync, BanStore, Settings.storeKey .. Id, { true, Executor, Reason })
 	print(typeof(Err), Err)
 	if Err then
@@ -97,7 +97,7 @@ function banService:Add(Id: number, Executor: number, Reason: string | number): 
 	end
 end
 
-function banService:Remove(Id: number): (string | nil)
+function banService:Remove(Id: number): (string?)
 	local _, Err = pcall(BanStore.RemoveAsync, BanStore, Settings.storeKey .. Id)
 	print(typeof(Err), Err)
 	if Err then
