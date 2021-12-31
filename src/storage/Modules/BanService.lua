@@ -26,7 +26,7 @@ local retry = {}
 
 --
 
-function retry.Set(dataStore, dataKey, count, data)
+function retry.Set(dataStore: DataStore, dataKey: string, count: number, data: any)
 	return Promise.new(function(resolve, reject)
 		count = tonumber(count)
 		local ok, result
@@ -43,7 +43,7 @@ function retry.Set(dataStore, dataKey, count, data)
 	end)
 end
 
-function retry.Get(dataStore, dataKey, count)
+function retry.Get(dataStore: DataStore, dataKey: string, count: number)
 	return Promise.new(function(resolve, reject)
 		count = tonumber(count)
 		local ok, result, data
@@ -62,7 +62,7 @@ function retry.Get(dataStore, dataKey, count)
 	end)
 end
 
-function retry.Remove(dataStore, dataKey, count)
+function retry.Remove(dataStore: DataStore, dataKey: string, count: number)
 	return Promise.new(function(resolve, reject)
 		count = tonumber(count)
 		local ok, result
@@ -81,7 +81,7 @@ end
 
 --
 
-function banService:Add(Id, Executor, Reason)
+function banService:Add(Id: number, Executor: number, Reason: string | number): (string | nil)
 	local _, Err = pcall(BanStore.SetAsync, BanStore, Settings.storeKey .. Id, { true, Executor, Reason })
 	print(typeof(Err), Err)
 	if Err then
@@ -97,7 +97,7 @@ function banService:Add(Id, Executor, Reason)
 	end
 end
 
-function banService:Remove(Id)
+function banService:Remove(Id: number): (string | nil)
 	local _, Err = pcall(BanStore.RemoveAsync, BanStore, Settings.storeKey .. Id)
 	print(typeof(Err), Err)
 	if Err then
@@ -115,7 +115,7 @@ function banService:Remove(Id)
 	end
 end
 
-function banService:GetBanInfo(Id)
+function banService:GetBanInfo(Id: number): (boolean, string, number)
 	local isBanned, executorId, banReason
 
 	local _, Err = pcall(function()
