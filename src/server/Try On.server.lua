@@ -21,6 +21,8 @@ local Tool = ReplicatedStorage.TryOn["Shopping Bag"]
 local Util = require(ReplicatedStorage.Shared.Util)
 local Key = require(ServerStorage.Storage.Modules.Key)
 
+type func = (...any) -> (...any)
+
 do
 	for _, model in ipairs(Folder:GetChildren()) do
 		model:SetAttribute("PI", Key.new(10))
@@ -34,7 +36,7 @@ local serverConfig = setmetatable({
 	originalClothes = {},
 	bagsEquipped = {},
 }, {
-	__index = function(_, indx)
+	__index = function(_, indx: string)
 		error(
 			(
 				"Try On::serverConfigError: Attempt to get serverConfig value with a nil index. -> serverConfig[%s]?\n\n%s"
@@ -42,7 +44,7 @@ local serverConfig = setmetatable({
 		)
 	end,
 
-	__newindex = function(_, indx, val)
+	__newindex = function(_, indx: string, val: any)
 		error(
 			("Try On::serverConfigError: New items are disallowed! -> Operation (serverConfig[%s] = %s) failed.\n\n%s"):format(
 				indx,
@@ -53,10 +55,9 @@ local serverConfig = setmetatable({
 	end,
 })
 
-local function makeLibraryMeta(Name)
-	assert(Name and typeof(Name) == "string", "makeLibraryMeta: Parameter 1 (Name) string expected")
+local function makeLibraryMeta(Name: string): ({ [string]: func })
 	return {
-		__index = function(_, indx)
+		__index = function(_, indx: string)
 			error(
 				("Try On::inBuiltLibraryError: %s is not a function of %s.\n\n%s"):format(indx, Name, debug.traceback())
 			)
@@ -66,29 +67,35 @@ end
 
 local Templates = setmetatable({}, makeLibraryMeta("Templates"))
 
-local function GetId(Object)
+local function GetId(Object: Instance): (number | string)
 	local result = Object:GetAttribute("ID")
 	return result or "nil"
 end
 
-local function IsBagEquipped(Player)
+local function IsBagEquipped(Player: Player): (boolean)
 	return serverConfig.bagsEquipped[Player.Name]
 end
 
-function Templates.New(Shirt, Pant)
+function Templates.New(Shirt: number, Pant: number): ({ [string]: number })
 	return {
 		TemplateS = Shirt,
 		TemplateP = Pant,
 	}
 end
 
-function OnClicked(Player, shirtId, pantsId, templateTable, character)
+function OnClicked(
+	Player: Player,
+	shirtId: number,
+	pantsId: number,
+	templateTable: { [string]: number },
+	character: Model
+): ()
 	if IsBagEquipped(Player) then
 		Event:FireClient(Player, "Open", shirtId, pantsId, templateTable, character)
 	end
 end
 
-function customOnMouseClick(Player, TheirTool)
+function customOnMouseClick(Player: Player, TheirTool: Tool)
 	local _, MouseTarget = pcall(Function.InvokeClient, Function, Player, "MouseTarget")
 	local shirt, pants
 	if IsBagEquipped(Player) then
@@ -119,7 +126,7 @@ function customOnMouseClick(Player, TheirTool)
 	end
 end
 
-Event.OnServerEvent:Connect(function(Player, ClientKey, Starter, ...)
+Event.OnServerEvent:Connect(function(Player: Player, ClientKey: string, Starter: string, ...: any)
 	local Data = { ... }
 	if serverConfig.Keys[Player.UserId] == ClientKey then
 		if Starter == "TryOn" then
@@ -147,7 +154,7 @@ Event.OnServerEvent:Connect(function(Player, ClientKey, Starter, ...)
 	end
 end)
 
-function Rewrite(Player, TheirTool)
+function Rewrite(Player: Player, TheirTool: Tool): ()
 	for _, b in ipairs(Connections[Player.UserId]) do
 		if b ~= nil then
 			b:Disconnect()
@@ -175,7 +182,7 @@ function Rewrite(Player, TheirTool)
 	)
 end
 
-Players.PlayerAdded:Connect(function(Player)
+Players.PlayerAdded:Connect(function(Player: Player)
 	Connections[Player.UserId] = {}
 	PermConnections[Player.UserId] = {}
 
@@ -216,7 +223,7 @@ Players.PlayerAdded:Connect(function(Player)
 		:await()
 end)
 
-Players.PlayerRemoving:Connect(function(Player)
+Players.PlayerRemoving:Connect(function(Player: Player)
 	Connections[Player.UserId] = nil
 	serverConfig.Keys[Player.UserId] = nil
 end)
