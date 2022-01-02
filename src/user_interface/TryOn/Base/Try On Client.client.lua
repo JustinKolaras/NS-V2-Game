@@ -338,9 +338,7 @@ local function err(info: string, text: string?): ()
 	end
 end
 
-local function isOwned(
-	indivButton: TextButton
-): (string?) -- not a bool. returns a string if passed, and string is a truthy val
+local function isOwned(indivButton: TextButton): (string?)
 	return indivButton.Text:lower():match("owned")
 end
 
