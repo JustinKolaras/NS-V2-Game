@@ -157,7 +157,7 @@ function Time.Get(): (number)
 	local archivedLoads = clientConfig.archivedLoads
 
 	local toReturn = tostring(os.clock() - loadingTimes[1])
-	toReturn = (#tostring(loadingTimes[1]) < 3) and toReturn:sub(1, #tostring(loadingTimes[1])) or toReturn:sub(1, 3)
+	toReturn = toReturn:sub(1, 3)
 
 	table.move(loadingTimes, 1, 1, select("#", archivedLoads), archivedLoads)
 
