@@ -52,7 +52,6 @@ function Util:WaitForChildOfClass(Parent: Instance, Class: string, Timeout: numb
 		if not disregard then
 			temp = Parent.ChildAdded:Connect(function(it)
 				if it:IsA(Class) then
-					disregard = true
 					temp:Disconnect()
 					temp = nil
 					resolve(it)
@@ -60,7 +59,7 @@ function Util:WaitForChildOfClass(Parent: Instance, Class: string, Timeout: numb
 			end)
 			Promise.delay(Timeout):andThen(function()
 				if not disregard then
-					warn(("Timeout reached on:\n%s waiting for %s"):format(tostring(Parent), Class))
+					warn(("Timeout reached on:\n%s waiting for %s"):format(Parent.Name, Class))
 					if temp and temp.Connected then
 						temp:Disconnect()
 						temp = nil
@@ -93,7 +92,6 @@ function Util:WaitForNewParent(Object: Instance, Timeout: number, Parent: Instan
 		if not disregard then
 			temp = Object:GetPropertyChangedSignal("Parent"):Connect(function(it)
 				if (Parent and it == Parent) or not Parent then
-					disregard = true
 					temp:Disconnect()
 					temp = nil
 					resolve(it)
@@ -101,7 +99,12 @@ function Util:WaitForNewParent(Object: Instance, Timeout: number, Parent: Instan
 			end)
 			Promise.delay(Timeout):andThen(function()
 				if not disregard then
-					warn(("Timeout reached on:\n%s waiting for a new parent"):format(tostring(Object)))
+					warn(
+						("Timeout reached on:\n%s waiting for a new parent (%s)"):format(
+							Object.Name,
+							Parent and Parent.Name or ""
+						)
+					)
 					if temp and temp.Connected then
 						temp:Disconnect()
 						temp = nil
