@@ -13,6 +13,7 @@ local StarterGui = game:GetService("StarterGui")
 local Camera = workspace.CurrentCamera
 
 local Player = Players.LocalPlayer
+local Mouse = Player:GetMouse()
 
 local Gui = Player.PlayerGui
 if not Gui then
@@ -23,6 +24,8 @@ end
 
 local Promise = require(ReplicatedStorage.Shared.Promise)
 local Util = require(ReplicatedStorage.Shared.Util)
+
+local Folder = workspace.Mannequins
 
 local ScreenGui = Gui.TryOn
 
@@ -47,6 +50,9 @@ local AdvTrigger = AdvTriggFrame.Trigger
 local Notice = ScreenGui.Notice
 local NoticeCloseButton = Notice.X
 local NoticeDesc = Notice.Desc
+
+local Hover = ScreenGui.Hover
+local HoverViewport = Hover.Mannequin
 
 local TryOnFolder = ReplicatedStorage:FindFirstChild("TryOn")
 
@@ -112,6 +118,10 @@ local clientConfig = setmetatable({
 	noticeExecErrorText = "Please join our Discord server with this screenshot as a bug report. This usually has something to do with your avatar - try removing packages!",
 	loadingTimes = {},
 	archivedLoads = {},
+	bagData = {
+		equipped = false,
+		tool = 0,
+	},
 }, {
 	__index = function(_, indx: string)
 		error(
@@ -188,6 +198,14 @@ function Core.elements(Toggle: boolean): ()
 			ok, _ = pcall(ResetButtonCallback)
 		until ok or timeout == 10
 	end
+end
+
+local function isBagEquipped(): (boolean)
+	return clientConfig.bagData.equipped
+end
+
+local function getTool(): (Tool)
+	return clientConfig.bagData.tool
 end
 
 local function fireServer(...: any): ()
@@ -360,7 +378,7 @@ local function disconnect(Client: Player): ()
 	end
 end
 
-function createViewport(templates: { [string]: number })
+function createViewport(templates: { [string]: number }, isHoverViewport: boolean?)
 	return Promise.new(function(resolve)
 		Viewport:ClearAllChildren()
 
@@ -384,7 +402,7 @@ function createViewport(templates: { [string]: number })
 			b.Parent = newModel
 		end
 
-		local vpCam = Util:Create("Camera", { FieldOfView = 5, Parent = Viewport })
+		local vpCam = Util:Create("Camera", { FieldOfView = 5, Parent = isHoverViewport and Viewport or HoverViewport })
 		Viewport.CurrentCamera = vpCam
 
 		vpCam.CFrame = CFrame.new(Vector3.new(0, 2, 12), hrp.Position)
@@ -713,12 +731,40 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 		end)
 	elseif Key == "Config" then
 		clientConfig.key = Data[1]
+	elseif Key == "BagConfig" then
+		if Data[1] then
+			clientConfig.bagData.equipped = true
+			clientConfig.bagData.tool = Data[2]
+		else
+			clientConfig.bagData.equipped = false
+			clientConfig.bagData.tool = 0
+		end
+	end
+end)
+
+Mouse.Move:Connect(function()
+	local mouseTarget = Mouse.Target
+	local clickDetector = mouseTarget.Parent:FindFirstChildOfClass("ClickDetector")
+
+	local bagEquipped = isBagEquipped()
+	local tool
+
+	if bagEquipped then
+		tool = getTool()
+		if Util:FindAbsoluteAncestor(Folder, mouseTarget) and clickDetector then
+			if (tool.Handle.Position - mouseTarget.Position).Magnitude <= clickDetector.MaxActivationDistance then
+				Hover.Visible = true
+				Hover.Position = UDim2.fromOffset(Mouse.X + 100, Mouse.Y - 30)
+			end
+		else
+			Hover.Visible = false
+		end
 	end
 end)
 
 Function.OnClientInvoke = function(Key: string)
 	if Key == "MouseTarget" then
-		return Player:GetMouse().Target
+		return Mouse.Target
 	end
 end
 

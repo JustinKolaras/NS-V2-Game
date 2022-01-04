@@ -166,12 +166,14 @@ function Rewrite(Player: Player, TheirTool: Tool): ()
 		Connections[Player.UserId],
 		TheirTool.Equipped:Connect(function()
 			serverConfig.bagsEquipped[Player.Name] = true
+			Event:FireClient(Player, "BagConfig", true, TheirTool)
 		end)
 	)
 	table.insert(
 		Connections[Player.UserId],
 		TheirTool.Unequipped:Connect(function()
 			serverConfig.bagsEquipped[Player.Name] = nil
+			Event:FireClient(Player, "BagConfig", false)
 		end)
 	)
 	table.insert(

@@ -1,6 +1,6 @@
 --- @class Util
 ---
---- Holds all utility functions.
+--- Holds all utility functions; developed by Aerosphia.
 
 local Util = {}
 
