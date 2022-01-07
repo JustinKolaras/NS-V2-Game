@@ -21,8 +21,6 @@ local Tool = ReplicatedStorage.TryOn["Shopping Bag"]
 local Util = require(ReplicatedStorage.Shared.Util)
 local Key = require(ServerStorage.Storage.Modules.Key)
 
-type func = (...any) -> (...any)
-
 do
 	for _, model in ipairs(Folder:GetChildren()) do
 		model:SetAttribute("PI", Key.new(10))
@@ -55,7 +53,7 @@ local serverConfig = setmetatable({
 	end,
 })
 
-local function makeLibraryMeta(Name: string): ({ [string]: func })
+local function makeLibraryMeta(Name: string): ({ [string]: (...any) -> (nil) })
 	return {
 		__index = function(_, indx: string)
 			error(

@@ -60,8 +60,6 @@ local Event = TryOnFolder:FindFirstChild("TryOn Event")
 local Function = TryOnFolder:FindFirstChild("TryOn Function")
 local viewportCharacter = TryOnFolder:FindFirstChild("Character")
 
-type func = (...any) -> (...any)
-
 local clientConfig = setmetatable({
 	key = 0,
 	templatePrefix = "http://www.roblox.com/asset/?id=%d",
@@ -140,7 +138,7 @@ local clientConfig = setmetatable({
 	end,
 })
 
-local function makeLibraryMeta(Name: string): ({ [string]: func })
+local function makeLibraryMeta(Name: string): ({ [string]: (...any) -> (nil) })
 	return {
 		__index = function(_, indx: string)
 			error(

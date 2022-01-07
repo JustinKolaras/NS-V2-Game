@@ -52,6 +52,7 @@ function Util:WaitForChildOfClass(Parent: Instance, Class: string, Timeout: numb
 		if not disregard then
 			temp = Parent.ChildAdded:Connect(function(it)
 				if it:IsA(Class) then
+					disregard = true
 					temp:Disconnect()
 					temp = nil
 					resolve(it)
@@ -92,6 +93,7 @@ function Util:WaitForNewParent(Object: Instance, Timeout: number, Parent: Instan
 		if not disregard then
 			temp = Object:GetPropertyChangedSignal("Parent"):Connect(function(it)
 				if (Parent and it == Parent) or not Parent then
+					disregard = true
 					temp:Disconnect()
 					temp = nil
 					resolve(it)
