@@ -22,11 +22,9 @@ function Util:FindAbsoluteAncestor(Ancestor: Instance, Current: Instance): (Inst
 		end
 		if Current then
 			toReturn = Current.Parent
+			Current = nil
 		elseif toReturn then
 			toReturn = toReturn.Parent
-		end
-		if Current then
-			Current = nil
 		end
 	until (toReturn.Name == Ancestor.Name) and (toReturn.ClassName == Ancestor.ClassName)
 	return toReturn
@@ -168,6 +166,26 @@ function Util:MoveChildren(Previous: Instance, Next: Instance, shouldDelete: boo
 	if shouldDelete then
 		Previous:Destroy()
 	end
+end
+
+--[=[
+	Clone of: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flat
+	Depth is always 1 for now.
+
+	NOT RELIABLE YET!!
+
+	@param Array array -- The array to flatten
+	@return array
+]=]
+function Util:Flatten(Array: any): (any)
+	local newArray = Array
+	for indx, val in ipairs(Array) do
+		if typeof(val) == "table" then
+			table.move(val, 1, #val, #newArray, newArray)
+			table.remove(Array, indx)
+		end
+	end
+	return newArray
 end
 
 return Util
