@@ -188,4 +188,32 @@ function Util:Flatten(Array: any): (any)
 	return newArray
 end
 
+--[=[
+	Uses the Promise library to wait for the callback in "callbackFn" to produce a truthy value.
+	If after the timeout there is no truthy value, the Promise will be rejected.
+
+	Only works with :await() paired to it.
+
+	@param callbackFn function -- The callback function to return at
+	@param timeoutSecs number -- The timeout of the promise
+	@return Promise<void>
+]=]
+function Util:WaitUntil(callbackFn: (nil) -> (nil), timeoutSecs: number)
+	return Promise.new(function(resolve, reject)
+		local resolving = false
+		task.delay(timeoutSecs, function()
+			if not resolving then
+				reject()
+			end
+		end)
+		while task.wait() do
+			local callback = callbackFn()
+			if callback then
+				resolving = true
+				resolve()
+			end
+		end
+	end)
+end
+
 return Util

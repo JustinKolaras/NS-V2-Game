@@ -15,15 +15,15 @@ local Camera = workspace.CurrentCamera
 local Player = Players.LocalPlayer
 local Mouse = Player:GetMouse()
 
-local Gui = Player.PlayerGui
-if not Gui then
-	repeat
-		task.wait()
-	until Gui ~= nil
-end
-
 local Promise = require(ReplicatedStorage.Shared.Promise)
 local Util = require(ReplicatedStorage.Shared.Util)
+
+local Gui = Player.PlayerGui
+if not Gui then
+	Util:WaitUntil(function()
+		return Gui ~= nil
+	end, 5):await():catch(error)
+end
 
 local Folder = workspace.Mannequins
 
