@@ -206,12 +206,13 @@ function Util:WaitUntil(callbackFn: (nil) -> (nil), timeoutSecs: number)
 				reject("Timeout reached on :WaitUntil() callback.")
 			end
 		end)
-		while task.wait() do
+		while true do
 			local callback = callbackFn()
 			if callback then
 				resolving = true
 				resolve()
 			end
+			task.wait()
 		end
 	end)
 end
