@@ -1,6 +1,7 @@
 --[[
 
 	TryOn Ver. 1.0
+	A mannequin interaction system.
 	Developed by Aerosphia
 
 ]]

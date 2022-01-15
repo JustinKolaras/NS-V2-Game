@@ -1,6 +1,7 @@
 --[[
 
 	TryOn Ver. 1.0
+	A mannequin interaction system.
 	Developed by Aerosphia
 
 ]]
@@ -220,6 +221,9 @@ local function getPi(mannequin: Model): (string)
 	return value
 end
 
+-- This function doesn't work properly in a certain way, but I'm not using it
+-- in that way, so I don't care to fix it. Don't rely on it to meet your
+-- needs.
 local function checkAsset(Proto: boolean, ...: number)
 	local Data = { ... }
 	return Promise.new(function(resolve)
@@ -243,7 +247,7 @@ local function checkAsset(Proto: boolean, ...: number)
 	end)
 end
 
-local function productInfo(id: number, enum: any) -- don't think there is a type for enum references
+local function productInfo(id: number, enum: any)
 	assert(enum.EnumType == Enum.InfoType, "productInfo: Parameter 2 (enum) InfoType Enumerator expected")
 	return Promise.new(function(resolve, reject)
 		local succ, result = pcall(Market.GetProductInfo, Market, id, enum)
@@ -351,7 +355,7 @@ end
 local function disconnect(Client: Player): ()
 	if Client.UserId == Player.UserId then
 		for _, outermost in pairs(clientConfig._connections) do
-			if typeof(outermost) == "table" then -- Not expecting to see more tables, so we'll loop here
+			if typeof(outermost) == "table" then
 				for _, innermost in pairs(outermost) do
 					if typeof(innermost) == "RBXScriptConnection" then
 						pcall(innermost.Disconnect, innermost)
