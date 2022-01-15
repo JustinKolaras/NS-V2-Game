@@ -188,7 +188,11 @@ function Core.elements(Toggle: boolean): ()
 		repeat
 			timeout += 1
 			ok, _ = pcall(ResetButtonCallback)
+			task.wait()
 		until ok or timeout == 10
+		if timeout >= 10 then
+			warn("Core.elements: Timeout reached after 10 unsuccessful pcall attempts.")
+		end
 	end
 end
 
