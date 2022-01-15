@@ -1,3 +1,5 @@
+-- This is the main "entry point" of the game, which handles new players and connects various systems.
+
 local ServerStorage = game:GetService("ServerStorage")
 local Messaging = game:GetService("MessagingService")
 local Players = game:GetService("Players")
