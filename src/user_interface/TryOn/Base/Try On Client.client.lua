@@ -24,8 +24,8 @@ if not Gui then
 		:WaitUntil(function()
 			return Gui ~= nil
 		end, 5)
-		:await()
 		:catch(error)
+		:await()
 end
 
 local ScreenGui = Gui.TryOn
