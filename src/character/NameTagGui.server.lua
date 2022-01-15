@@ -70,11 +70,12 @@ end
 if Player:GetRankInGroup(8046949) >= 252 then
 	local speed = 10
 	task.spawn(function()
-		while task.wait() do
+		while true do
 			for i = 0, 1, 0.001 * speed do
 				ClonedUser.TextColor3 = Color3.fromHSV(i, 1, 1)
 				task.wait()
 			end
+			task.wait()
 		end
 	end)
 end

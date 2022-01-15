@@ -76,7 +76,8 @@ Event.OnClientEvent:Connect(function(Starter, ...)
 end)
 
 task.spawn(function()
-	while task.wait(inactiveTime) do
+	while true do
+		task.wait(inactiveTime)
 		if automatic then
 			if #Hints == 0 then
 				for _, b in pairs(Clearing) do
