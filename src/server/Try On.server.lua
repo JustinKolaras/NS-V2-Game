@@ -66,6 +66,13 @@ end
 
 local Templates = setmetatable({}, makeLibraryMeta("Templates"))
 
+function Templates.New(Shirt: number, Pant: number): ({ [string]: number })
+	return {
+		TemplateS = Shirt,
+		TemplateP = Pant,
+	}
+end
+
 local function GetId(Object: Instance): (number | string)
 	local result = Object:GetAttribute("ID")
 	return result or "nil"
@@ -75,14 +82,7 @@ local function IsBagEquipped(Player: Player): (boolean)
 	return serverConfig.bagsEquipped[Player.Name]
 end
 
-function Templates.New(Shirt: number, Pant: number): ({ [string]: number })
-	return {
-		TemplateS = Shirt,
-		TemplateP = Pant,
-	}
-end
-
-function OnClicked(
+local function OnClicked(
 	Player: Player,
 	shirtId: number,
 	pantsId: number,
@@ -94,7 +94,7 @@ function OnClicked(
 	end
 end
 
-function customOnMouseClick(Player: Player, TheirTool: Tool)
+local function customOnMouseClick(Player: Player, TheirTool: Tool)
 	local _, MouseTarget = pcall(Function.InvokeClient, Function, Player, "MouseTarget")
 	local shirt, pants
 	if IsBagEquipped(Player) then
@@ -153,7 +153,7 @@ Event.OnServerEvent:Connect(function(Player: Player, ClientKey: string, Starter:
 	end
 end)
 
-function Rewrite(Player: Player, TheirTool: Tool): ()
+local function Rewrite(Player: Player, TheirTool: Tool): ()
 	for _, b in ipairs(Connections[Player.UserId]) do
 		if b ~= nil then
 			b:Disconnect()
