@@ -24,7 +24,8 @@ if not Gui then
 	Util
 		:WaitUntil(function()
 			return Gui ~= nil
-		end, 5)
+		end)
+		:timeout(5)
 		:catch(error)
 		:await()
 end

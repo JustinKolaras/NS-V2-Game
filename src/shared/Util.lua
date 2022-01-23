@@ -169,47 +169,19 @@ function Util:MoveChildren(Previous: Instance, Next: Instance, shouldDelete: boo
 end
 
 --[=[
-	Clone of: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flat
-	Depth is always 1 for now.
-
-	NOT RELIABLE YET!!
-
-	@param Array array -- The array to flatten
-	@return array
-]=]
-function Util:Flatten(Array: any): (any)
-	local newArray = Array
-	for indx, val in ipairs(Array) do
-		if typeof(val) == "table" then
-			table.move(val, 1, #val, #newArray, newArray)
-			table.remove(Array, indx)
-		end
-	end
-	return newArray
-end
-
---[=[
 	Uses the Promise library to wait for the callback in "callbackFn" to produce a truthy value.
-	If after the timeout there is no truthy value, the Promise will be rejected.
+	A timeout can be paired to this, using :timeout() with the Promise library.
 
 	Only works with :await() paired to it.
 
 	@param callbackFn function -- The callback function to return at
-	@param timeoutSecs number -- The timeout of the promise
 	@return Promise<void>
 ]=]
-function Util:WaitUntil(callbackFn: (nil) -> (nil), timeoutSecs: number)
-	return Promise.new(function(resolve, reject)
-		local resolving = false
-		task.delay(timeoutSecs, function()
-			if not resolving then
-				reject("Timeout reached on :WaitUntil() callback.")
-			end
-		end)
+function Util:WaitUntil(callbackFn: (nil) -> (nil))
+	return Promise.defer(function(resolve)
 		while true do
 			local callback = callbackFn()
 			if callback then
-				resolving = true
 				resolve()
 			end
 			task.wait()
