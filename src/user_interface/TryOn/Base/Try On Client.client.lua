@@ -156,7 +156,7 @@ function Time.Set(): ()
 	table.insert(clientConfig.loadingTimes, 1, os.clock())
 end
 
-function Time.Get(): (number)
+function Time.Get(): (number?)
 	local loadingTimes = clientConfig.loadingTimes
 	local archivedLoads = clientConfig.archivedLoads
 
@@ -447,7 +447,7 @@ local function advConnectionUnit()
 				end
 			end)
 		clientConfig._connections.advancedView.speedInputFocusLost = SpeedInput.FocusLost:Connect(function()
-			local clamped = math.clamp(tonumber(SpeedInput.Text), 0, 5)
+			local clamped = math.clamp(tonumber(SpeedInput.Text) or 0, 0, 5)
 
 			if clamped == 5 then
 				SpeedInput.Text = "5"
@@ -573,7 +573,7 @@ local function mainConnectionUnit(shirtObject: number, pantObject: number)
 						temp = nil
 					end
 					vpChar:SetPrimaryPartCFrame(
-						vpChar:GetPrimaryPartCFrame() * CFrame.fromEulerAnglesXYZ(0, tonumber(atr), 0)
+						vpChar:GetPrimaryPartCFrame() * CFrame.fromEulerAnglesXYZ(0, tonumber(atr) or 0, 0)
 					)
 				end)
 			elseif ManType.Text == "3D" then
