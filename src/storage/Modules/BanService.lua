@@ -100,7 +100,7 @@ function banService:Add(Id: number, Executor: number, Reason: string | number): 
 			end)
 			:await()
 		if Err then
-			return "Error: " .. tostring(Err)
+			return tostring(Err)
 		end
 	end
 end
@@ -114,7 +114,7 @@ function banService:Remove(Id: number): (string?)
 			end)
 			:await()
 		if Err then
-			return "Error: " .. tostring(Err)
+			return tostring(Err)
 		end
 	end
 end
@@ -138,7 +138,7 @@ function banService:GetBanInfo(Id: number): (boolean, string, number)
 				Err = errorMsg
 			end)
 		if Err then
-			return "Error: " .. tostring(Err)
+			return tostring(Err)
 		end
 	end
 
