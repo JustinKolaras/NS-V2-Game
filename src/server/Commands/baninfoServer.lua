@@ -5,7 +5,7 @@ local BanService = require(ServerStorage.Storage.Modules.BanService)
 
 return function(Context, Player)
 	local Executor = Context.Executor
-	local PlayerBanned, BanReason, ExecutorId = BanService:GetBanInfo(Player)
+	local PlayerBanned, BanReason, ExecutorId, System = BanService:GetBanInfo(Player)
 
 	if Player == Executor.UserId then
 		return "You can't perform this action on yourself."
@@ -16,7 +16,7 @@ return function(Context, Player)
 
 	return ('%s was banned by %s for: "%s"'):format(
 		Players:GetNameFromUserIdAsync(Player),
-		Players:GetNameFromUserIdAsync(ExecutorId),
+		if System then "System" else Players:GetNameFromUserIdAsync(ExecutorId),
 		BanReason
 	)
 end
