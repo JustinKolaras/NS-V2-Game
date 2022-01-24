@@ -7,7 +7,7 @@ return {
 		{
 			Type = "playerId",
 			Name = "player",
-			Description = "The full player name to check.",
+			Description = "The player to get information on.",
 		},
 	},
 }
