@@ -46,6 +46,7 @@ Players.PlayerAdded:Connect(function(Player)
 		task.wait(0.1)
 		NoCollide(Character)
 		connection:Disconnect()
+		connection = nil
 	end)
 
 	if Player.Character then
