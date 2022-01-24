@@ -32,7 +32,7 @@ local inactiveTime = 60
 
 local automatic = true
 
-function Hint(Text, Permanent)
+function Hint(Text)
 	if ClipFrame.Position ~= UDim2.new(0, 0, -0.5, 0) then
 		ClipFrame.Position = UDim2.new(0, 0, -0.5, 0)
 	end
@@ -40,11 +40,9 @@ function Hint(Text, Permanent)
 	ClipFrame.Visible = true
 	ClipFrame:TweenPosition(UDim2.new(0, 0, 0, 0), "Out", "Quint", 1, false, function()
 		if Enum.TweenStatus.Completed then
-			if not Permanent then
+			if automatic then
 				task.delay(activeTime, function()
-					if automatic then
-						ClipFrame:TweenPosition(UDim2.new(0, 0, -0.5, 0), "Out", "Quint", 1)
-					end
+					ClipFrame:TweenPosition(UDim2.new(0, 0, -0.5, 0), "Out", "Quint", 1)
 				end)
 			end
 		end
@@ -59,12 +57,12 @@ Event.OnClientEvent:Connect(function(Starter, ...)
 			ClipFrame:TweenPosition(UDim2.new(0, 0, -0.5, 0), "Out", "Quint", 1, false, function()
 				automatic = false
 				task.wait(0.1)
-				Hint(Text, true)
+				Hint(Text)
 			end)
 		else
 			automatic = false
 			task.wait(0.1)
-			Hint(Text, true)
+			Hint(Text)
 		end
 	elseif Starter == "Deactivate" then
 		if not automatic then
@@ -86,7 +84,7 @@ task.spawn(function()
 			end
 			local Chosen = Hints[math.random(1, #Hints)]
 			Hint(Chosen, false)
-			for a, b in pairs(Hints) do
+			for a, b in ipairs(Hints) do
 				if b == Chosen then
 					table.insert(Clearing, b)
 					table.remove(Hints, a)
