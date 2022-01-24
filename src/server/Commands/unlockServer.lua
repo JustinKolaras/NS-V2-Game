@@ -6,7 +6,7 @@ return function()
 	local errorMsg = LockModule:Unlock()
 
 	if errorMsg then
-		return tostring(errorMsg)
+		return "Error: " .. tostring(errorMsg)
 	end
 
 	return "Unlocked server."
