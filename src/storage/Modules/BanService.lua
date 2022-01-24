@@ -82,9 +82,8 @@ end
 --
 
 function banService:Add(Id: number, Executor: number, Reason: string | number): (string?)
-	local _, Err = pcall(BanStore.SetAsync, BanStore, Settings.storeKey .. Id, { true, Executor, Reason })
-	print(typeof(Err), Err)
-	if Err then
+	local ok, Err = pcall(BanStore.SetAsync, BanStore, Settings.storeKey .. Id, { true, Executor, Reason })
+	if not ok then
 		retry.Set(BanStore, Settings.storeKey .. Id, 5, { true, Executor, Reason })
 			:catch(function(errorMsg)
 				Err = errorMsg
@@ -98,9 +97,8 @@ function banService:Add(Id: number, Executor: number, Reason: string | number): 
 end
 
 function banService:Remove(Id: number): (string?)
-	local _, Err = pcall(BanStore.RemoveAsync, BanStore, Settings.storeKey .. Id)
-	print(typeof(Err), Err)
-	if Err then
+	local ok, Err = pcall(BanStore.RemoveAsync, BanStore, Settings.storeKey .. Id)
+	if not ok then
 		retry.Remove(BanStore, Settings.storeKey .. Id, 5)
 			:catch(function(errorMsg)
 				Err = errorMsg
@@ -116,16 +114,16 @@ function banService:Remove(Id: number): (string?)
 end
 
 function banService:GetBanInfo(Id: number): (boolean, string, number)
-	local isBanned, executorId, banReason
+	local isBanned, executorId, banReason, isSystem
 
-	local _, Err = pcall(function()
+	local ok, Err = pcall(function()
 		local getData = BanStore:GetAsync(Settings.storeKey .. Id)
 		if getData ~= nil then
 			isBanned, executorId, banReason = unpack(getData)
 		end
 	end)
 
-	if Err then
+	if not ok then
 		retry.Get(BanStore, Settings.storeKey .. Id, 5)
 			:andThen(function(result)
 				isBanned, executorId, banReason = unpack(result)
@@ -138,7 +136,9 @@ function banService:GetBanInfo(Id: number): (boolean, string, number)
 		end
 	end
 
-	return isBanned, banReason, executorId
+	isSystem = executorId == "System"
+
+	return isBanned, banReason, executorId, isSystem
 end
 
 --

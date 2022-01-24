@@ -102,7 +102,7 @@ function Util:WaitForNewParent(Object: Instance, Timeout: number, Parent: Instan
 					warn(
 						("Timeout reached on:\n%s waiting for a new parent (%s)"):format(
 							Object.Name,
-							Parent and Parent.Name or ""
+							if Parent then Parent.Name else ""
 						)
 					)
 					if temp and temp.Connected then

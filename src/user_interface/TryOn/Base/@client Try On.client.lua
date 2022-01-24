@@ -252,7 +252,7 @@ local function productInfo(id: number, enum: any)
 	assert(enum.EnumType == Enum.InfoType, "productInfo: Parameter 2 (enum) InfoType Enumerator expected")
 	return Promise.new(function(resolve, reject)
 		local succ, result = pcall(Market.GetProductInfo, Market, id, enum)
-		return succ and resolve(result) or reject(result)
+		return if succ then resolve(result) else reject(result)
 	end)
 end
 
@@ -381,11 +381,8 @@ local function createViewport(templates: { [string]: number })
 
 		local newModel = Util:Create("Model", { Name = "Character", Parent = Viewport })
 
-		local hrp
+		local hrp = clone:FindFirstChild("HumanoidRootPart")
 		for _, b in ipairs(clone:GetChildren()) do
-			if b.Name == "HumanoidRootPart" then
-				hrp = b
-			end
 			if b.Name == "Head" then
 				b["default face"]:Destroy()
 			end
@@ -720,7 +717,7 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 
 			print(("Took " .. Time.Get() .. " seconds to load on client %s!"):format(Player.Name))
 		end):catch(function(errorMsg)
-			return Base.Visible and err(errorMsg) or newNotice(clientConfig.noticeExecErrorText)
+			return if Base.Visible then err(errorMsg) else newNotice(clientConfig.noticeExecErrorText)
 		end)
 	elseif Key == "Config" then
 		clientConfig.key = Data[1]
