@@ -1,28 +1,33 @@
-local LockModule = {}
-local isLocked, lockReason, contextExecutor = false, "", nil
+local ServerLock = {}
 
-function LockModule:Lock(reason, executor)
-	if isLocked and #lockReason > 0 then
-		return "Already locked: " .. lockReason .. " (" .. tostring(contextExecutor) .. ")"
+local moduleSettings = {
+	isLocked = false,
+	lockReason = "",
+	contextExecutor = nil,
+}
+
+function ServerLock:Lock(reason: string, executor: Player): (string?)
+	if moduleSettings.isLocked and #moduleSettings.lockReason > 0 then
+		return "Already locked: " .. moduleSettings.lockReason .. " (" .. tostring(moduleSettings.contextExecutor) .. ")"
 	elseif isLocked then
-		return "Already locked. (" .. tostring(contextExecutor) .. ")"
+		return "Already locked. ('" .. tostring(moduleSettings.lockReason) .. "')"
 	end
-	isLocked = true
-	lockReason = reason or ""
-	contextExecutor = executor
+	moduleSettings.isLocked = true
+	moduleSettings.lockReason = reason or ""
+	module.SettingscontextExecutor = executor
 end
 
-function LockModule:Unlock()
-	if not isLocked then
+function ServerLock:Unlock(): (string?)
+	if not moduleSettings.isLocked then
 		return "Not locked."
 	end
-	isLocked = false
-	lockReason = ""
-	contextExecutor = nil
+	moduleSettings.isLocked = false
+	moduleSettings.lockReason = ""
+	moduleSettings.contextExecutor = nil
 end
 
-function LockModule:Status()
-	return isLocked, lockReason, contextExecutor
+function ServerLock:Status(): (boolean, string, Player | nil)
+	return moduleSettings.isLocked, moduleSettings.lockReason, moduleSettings.contextExecutor
 end
 
-return LockModule
+return ServerLock

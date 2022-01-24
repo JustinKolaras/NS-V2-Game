@@ -1,3 +1,5 @@
+-- Old and disabled script, to be redone soon.
+
 local playerService = game:GetService("Players")
 local runService = game:GetService("RunService")
 game.ReplicatedFirst:RemoveDefaultLoadingScreen()
