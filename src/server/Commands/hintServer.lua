@@ -10,7 +10,7 @@ return function(Context, Text)
 	end
 
 	if Text:len() > 150 then
-		return "Reason too long."
+		return "Error: Reason too long. Cap: 150chars"
 	end
 
 	local cleanText

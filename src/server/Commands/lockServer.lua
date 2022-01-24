@@ -4,13 +4,13 @@ local LockModule = require(ServerStorage.Storage.Modules.Lock)
 
 return function(Context, lockReason)
 	if #lockReason > 100 then
-		return "Reason too long."
+		return "Error: Reason too long. Cap: 100chars"
 	end
 
 	local errorMsg = LockModule:Lock(lockReason, Context.Executor)
 	if errorMsg then
-		return tostring(errorMsg)
+		return "Error: " .. tostring(errorMsg)
 	end
 
-	return lockReason and "Locked server: " .. lockReason or "Locked server, no reason provided."
+	return if lockReason then "Locked server: " .. lockReason else "Locked server, no reason provided." 
 end

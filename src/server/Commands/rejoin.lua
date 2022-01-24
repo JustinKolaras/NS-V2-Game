@@ -1,6 +1,6 @@
 return {
 	Name = "rejoin",
-	Aliases = {},
+	Aliases = {"frisbee"},
 	Description = "Automatically rejoins a player to the same place.",
 	Group = "Admin",
 	Args = {
