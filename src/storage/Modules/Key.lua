@@ -13,7 +13,7 @@ function Key.new(Chars)
 	if not moduleConfig.used[currentKey] then
 		table.insert(moduleConfig.used, currentKey)
 		return currentKey
-	else
+	else -- Chances are astronomically low, but never 0!
 		repeat
 			task.wait(0.1)
 			currentKey = "_."
