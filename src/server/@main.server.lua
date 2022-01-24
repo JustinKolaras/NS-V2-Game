@@ -34,10 +34,8 @@ Players.PlayerAdded:Connect(function(Player)
 	end
 
 	local lockStatus, lockReason = Lock:Status()
-	if lockStatus and #lockReason > 0 then
-		return Player:Kick("\nLocked\n" .. lockReason)
-	elseif lockStatus then
-		return Player:Kick("This server is locked.")
+	if lockStatus then
+		return Player:Kick(if #lockReason > 0 then "\nLocked\n" .. lockReason else "This server is locked.")
 	end
 
 	local connection
