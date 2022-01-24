@@ -22,7 +22,17 @@ local Settings = {
 	storeKey = "playerBans//",
 }
 
-local retry = {}
+local function makeLibraryMeta(Name: string): ({ [string]: (...any) -> (nil) })
+	return {
+		__index = function(_, indx: string)
+			error(
+				("Ban Service::inBuiltLibraryError: %s is not a function of %s.\n\n%s"):format(indx, Name, debug.traceback())
+			)
+		end,
+	}
+end
+
+local retry = setmetatable({}, makeLibraryMeta("retry"))
 
 --
 
@@ -90,7 +100,6 @@ function banService:Add(Id: number, Executor: number, Reason: string | number): 
 			end)
 			:await()
 		if Err then
-			print(typeof(Err))
 			return "Error: " .. tostring(Err)
 		end
 	end
@@ -105,9 +114,6 @@ function banService:Remove(Id: number): (string?)
 			end)
 			:await()
 		if Err then
-			for a, b in next, Err do
-				print(a, b)
-			end
 			return "Error: " .. tostring(Err)
 		end
 	end

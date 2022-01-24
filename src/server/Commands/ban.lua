@@ -1,13 +1,13 @@
 return {
 	Name = "ban",
 	Aliases = {},
-	Description = "Bans a player from the game.",
+	Description = "Permanently bans a player from the game.",
 	Group = "Admin",
 	Args = {
 		{
 			Type = "playerId",
 			Name = "player",
-			Description = "The full player name to ban.",
+			Description = "The player to ban.",
 		},
 		{
 			Type = "string",

@@ -6,25 +6,25 @@ local BanService = require(ServerStorage.Storage.Modules.BanService)
 local Admins = require(ServerStorage.Storage.Modules.Admins)
 
 return function(Context, Victim, Reason)
-	if not Reason then
-		return "Reason required."
-	end
 	local Executor = Context.Executor
 	local isVictimBanned = BanService:GetBanInfo(Victim)
 
 	if Victim == Executor.UserId then
-		return "You can't perform this action on yourself."
+		return "Error: You can't perform this action on yourself."
 	end
+	
 	for _, b in next, Admins do
 		if b == Victim then
-			return "You can't perform this action on another moderator."
+			return "Error: You can't perform this action on another moderator."
 		end
 	end
+	
 	if isVictimBanned then
-		return Players:GetNameFromUserIdAsync(Victim) .. " is already banned."
+		return "Error: " .. Players:GetNameFromUserIdAsync(Victim) .. " is already banned."
 	end
+	
 	if #Reason > 85 then
-		return "Reason too long."
+		return "Error: Reason too long. Cap: 85chars"
 	end
 
 	local Format = ("\nBanned from all servers!\nModerator: %s\nReason: %s"):format(
@@ -34,10 +34,10 @@ return function(Context, Victim, Reason)
 
 	local err = BanService:Add(Victim, Executor.UserId, Reason)
 	if err then
-		return tostring(err)
+		return "Error: " .. tostring(err)
 	end
 
-	for _, b in next, Players:GetPlayers() do
+	for _, b in ipairs(Players:GetPlayers()) do
 		if b.UserId == Victim then
 			b:Kick(Format)
 		end

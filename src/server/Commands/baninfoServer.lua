@@ -8,10 +8,11 @@ return function(Context, Player)
 	local PlayerBanned, BanReason, ExecutorId, System = BanService:GetBanInfo(Player)
 
 	if Player == Executor.UserId then
-		return "You can't perform this action on yourself."
+		return "Error: You can't perform this action on yourself."
 	end
+	
 	if not PlayerBanned then
-		return Players:GetNameFromUserIdAsync(Player) .. " is not banned."
+		return "Error: " .. Players:GetNameFromUserIdAsync(Player) .. " is not banned."
 	end
 
 	return ('%s was banned by %s for: "%s"'):format(
