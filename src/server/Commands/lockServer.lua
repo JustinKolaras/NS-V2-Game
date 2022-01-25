@@ -12,5 +12,5 @@ return function(Context, lockReason)
 		return "Error: " .. tostring(errorMsg)
 	end
 
-	return if lockReason then "Locked server: " .. lockReason else "Locked server, no reason provided." 
+	return if lockReason then "Locked server: " .. lockReason else "Locked server, no reason provided."
 end

@@ -8,13 +8,17 @@ local moduleSettings = {
 
 function ServerLock:Lock(reason: string, executor: Player): (string?)
 	if moduleSettings.isLocked and #moduleSettings.lockReason > 0 then
-		return "Already locked: " .. moduleSettings.lockReason .. " (" .. tostring(moduleSettings.contextExecutor) .. ")"
-	elseif isLocked then
+		return "Already locked: "
+			.. moduleSettings.lockReason
+			.. " ("
+			.. tostring(moduleSettings.contextExecutor)
+			.. ")"
+	elseif moduleSettings.isLocked then
 		return "Already locked. ('" .. tostring(moduleSettings.lockReason) .. "')"
 	end
 	moduleSettings.isLocked = true
 	moduleSettings.lockReason = reason or ""
-	module.SettingscontextExecutor = executor
+	moduleSettings.SettingscontextExecutor = executor
 end
 
 function ServerLock:Unlock(): (string?)

@@ -7,7 +7,7 @@ return {
 		{
 			Type = "string",
 			Name = "reason",
-			Description = "The reason for shutting down the server."
-		}
+			Description = "The reason for shutting down the server.",
+		},
 	},
 }

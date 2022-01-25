@@ -1,6 +1,6 @@
 return {
 	Name = "kick",
-	Aliases = {"boot"},
+	Aliases = { "boot" },
 	Description = "Kicks a player from the server.",
 	Group = "Admin",
 	Args = {

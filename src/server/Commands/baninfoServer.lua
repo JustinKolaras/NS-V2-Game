@@ -10,7 +10,7 @@ return function(Context, Player)
 	if Player == Executor.UserId then
 		return "Error: You can't perform this action on yourself."
 	end
-	
+
 	if not PlayerBanned then
 		return "Error: " .. Players:GetNameFromUserIdAsync(Player) .. " is not banned."
 	end

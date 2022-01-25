@@ -12,17 +12,17 @@ return function(Context, Victim, Reason)
 	if Victim == Executor.UserId then
 		return "Error: You can't perform this action on yourself."
 	end
-	
+
 	for _, b in next, Admins do
 		if b == Victim then
 			return "Error: You can't perform this action on another moderator."
 		end
 	end
-	
+
 	if isVictimBanned then
 		return "Error: " .. Players:GetNameFromUserIdAsync(Victim) .. " is already banned."
 	end
-	
+
 	if #Reason > 85 then
 		return "Error: Reason too long. Cap: 85chars"
 	end
