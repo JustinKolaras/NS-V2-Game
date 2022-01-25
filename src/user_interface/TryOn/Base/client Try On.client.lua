@@ -92,6 +92,8 @@ local clientConfig = setmetatable({
 		mainLoad = 0,
 	},
 	_db = {
+		openBase = false,
+		closeBase = false,
 		avTrigg = false,
 		avExit = false,
 	},
@@ -494,6 +496,10 @@ local function mainConnectionUnit(shirtObject: number, pantObject: number)
 	end
 	return Promise.new(function(resolve)
 		clientConfig._connections.terminal.close = CloseButton.MouseButton1Click:Connect(function()
+			if clientConfig._db.closeBase then
+				return
+			end
+
 			close("Base", 1)
 		end)
 		clientConfig._connections.terminal.tryOn = TryOn.MouseButton1Click:Connect(function()
@@ -624,9 +630,19 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 	local Data = { ... }
 	if Key == "Open" then
 		clientConfig._promise.mainLoad = Promise.new(function(_, _, onCancel)
-			if Base.Visible or Notice.Visible or clientConfig.isAdvancedView then
+			if Base.Visible or Notice.Visible or clientConfig.isAdvancedView or clientConfig._db.openBase then
 				return
 			end
+
+			clientConfig._db.openBase = true
+			task.delay(2, function()
+				clientConfig._db.openBase = false
+			end)
+
+			clientConfig._db.closeBase = true
+			task.delay(1, function()
+				clientConfig._db.closeBase = false
+			end)
 
 			local shirt, pant = Data[1], Data[2]
 			local templateTable = Data[3]
