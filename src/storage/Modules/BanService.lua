@@ -1,5 +1,14 @@
 --[[
-	An extensible ban module by Aerosphia.	
+	An extensible ban module by Aerosphia.
+
+	Storage Information:
+	---
+	DataStore: PlayerBanStore
+	Key Format: playerBans//USER_ID
+
+	Storage Layout:
+	---
+	Array<{isBanned: bool, banReason: string, executorId: PlayerUserId | string<"System">, isSystem: bool}>
 ]]
 
 local banService = {}
@@ -95,6 +104,7 @@ end
 
 --
 
+-- Returns an error of type string if there is any. If there is no error, nothing is returned.
 function banService:Add(Id: number, Executor: number, Reason: string | number): (string?)
 	local ok, Err = pcall(BanStore.SetAsync, BanStore, Settings.storeKey .. Id, { true, Executor, Reason })
 	if not ok then
@@ -109,6 +119,7 @@ function banService:Add(Id: number, Executor: number, Reason: string | number): 
 	end
 end
 
+-- Returns an error of type string if there is any. If there is no error, nothing is returned.
 function banService:Remove(Id: number): (string?)
 	local ok, Err = pcall(BanStore.RemoveAsync, BanStore, Settings.storeKey .. Id)
 	if not ok then
@@ -123,7 +134,8 @@ function banService:Remove(Id: number): (string?)
 	end
 end
 
-function banService:GetBanInfo(Id: number): (boolean, string, number)
+-- Returns a tuple: isBanned: bool, banReason: string, executorId: number | string<"System">, isSystem: bool
+function banService:GetBanInfo(Id: number): (boolean, string, number, boolean)
 	local isBanned, executorId, banReason, isSystem
 
 	local ok, Err = pcall(function()
