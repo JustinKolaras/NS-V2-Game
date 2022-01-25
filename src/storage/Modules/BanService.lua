@@ -3,12 +3,12 @@
 
 	Storage Information:
 	---
-	DataStore: PlayerBanStore
+	DataStore: PlayerBans
 	Key Format: playerBans//USER_ID
 
 	Storage Layout:
 	---
-	Array<{isBanned: bool, banReason: string, executorId: PlayerUserId | string<"System">, isSystem: bool}>
+	Array<{isBanned: bool, banReason: string, executorId: PlayerUserId | string<"System">, date: string, isSystem: bool}>
 ]]
 
 local banService = {}
@@ -23,7 +23,7 @@ end
 
 local DataStoreService = game:GetService("DataStoreService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local BanStore = DataStoreService:GetDataStore("PlayerBanStore")
+local BanStore = DataStoreService:GetDataStore("PlayerBans")
 
 local Promise = require(ReplicatedStorage.Shared.Promise)
 
@@ -105,10 +105,10 @@ end
 --
 
 -- Returns an error of type string if there is any. If there is no error, nothing is returned.
-function banService:Add(Id: number, Executor: number, Reason: string | number): (string?)
-	local ok, Err = pcall(BanStore.SetAsync, BanStore, Settings.storeKey .. Id, { true, Executor, Reason })
+function banService:Add(Id: number, Executor: number, Reason: string | number, Date: string): (string?)
+	local ok, Err = pcall(BanStore.SetAsync, BanStore, Settings.storeKey .. Id, { true, Executor, Reason, Date })
 	if not ok then
-		retry.Set(BanStore, Settings.storeKey .. Id, 5, { true, Executor, Reason })
+		retry.Set(BanStore, Settings.storeKey .. Id, 5, { true, Executor, Reason, Date })
 			:catch(function(errorMsg)
 				Err = errorMsg
 			end)
@@ -135,20 +135,20 @@ function banService:Remove(Id: number): (string?)
 end
 
 -- Returns a tuple: isBanned: bool, banReason: string, executorId: number | string<"System">, isSystem: bool
-function banService:GetBanInfo(Id: number): (boolean, string, number, boolean)
-	local isBanned, executorId, banReason, isSystem
+function banService:GetBanInfo(Id: number): (boolean, string, number, string, boolean)
+	local isBanned, executorId, banReason, date, isSystem
 
 	local ok, Err = pcall(function()
 		local getData = BanStore:GetAsync(Settings.storeKey .. Id)
 		if getData ~= nil then
-			isBanned, executorId, banReason = unpack(getData)
+			isBanned, executorId, banReason, date = unpack(getData)
 		end
 	end)
 
 	if not ok then
 		retry.Get(BanStore, Settings.storeKey .. Id, 5)
 			:andThen(function(result)
-				isBanned, executorId, banReason = unpack(result)
+				isBanned, executorId, banReason, date = unpack(result)
 			end)
 			:catch(function(errorMsg)
 				Err = errorMsg
@@ -160,7 +160,7 @@ function banService:GetBanInfo(Id: number): (boolean, string, number, boolean)
 
 	isSystem = executorId == "System"
 
-	return isBanned, banReason, executorId, isSystem
+	return isBanned, banReason, executorId, date, isSystem
 end
 
 --

@@ -1,9 +1,11 @@
 local ServerStorage = game:GetService("ServerStorage")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local Messaging = game:GetService("MessagingService")
 
 local BanService = require(ServerStorage.Storage.Modules.BanService)
 local Admins = require(ServerStorage.Storage.Modules.Admins)
+local Util = require(ReplicatedStorage.Shared.Util)
 
 return function(Context, Victim, Reason)
 	local Executor = Context.Executor
@@ -27,20 +29,17 @@ return function(Context, Victim, Reason)
 		return "Error: Reason too long. Cap: 85chars"
 	end
 
-	local Format = ("\nBanned from all servers!\nModerator: %s\nReason: %s"):format(
+	local Date = Util:GetUTCDate()
+
+	local Format = ("\nBanned from all servers!\nModerator: %s\nReason: %s\n%s"):format(
 		Players:GetNameFromUserIdAsync(Executor.UserId),
-		Reason
+		Reason,
+		Date .. " UTC"
 	)
 
-	local err = BanService:Add(Victim, Executor.UserId, Reason)
+	local err = BanService:Add(Victim, Executor.UserId, Reason, Date)
 	if err then
 		return "Error: " .. tostring(err)
-	end
-
-	for _, b in ipairs(Players:GetPlayers()) do
-		if b.UserId == Victim then
-			b:Kick(Format)
-		end
 	end
 
 	Messaging:PublishAsync("Servers:Kick", {

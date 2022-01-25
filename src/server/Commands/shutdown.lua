@@ -1,6 +1,6 @@
 return {
 	Name = "shutdown",
-	Aliases = {},
+	Aliases = { "sd" },
 	Description = "Kicks everyone (including you) from the server.",
 	Group = "Admin",
 	Args = {
@@ -8,6 +8,7 @@ return {
 			Type = "string",
 			Name = "reason",
 			Description = "The reason for shutting down the server.",
+			Optional = true,
 		},
 	},
 }

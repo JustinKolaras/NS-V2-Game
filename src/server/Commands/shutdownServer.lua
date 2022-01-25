@@ -3,7 +3,7 @@ local Players = game:GetService("Players")
 return function(Context, Reason)
 	local Executor = Context.Executor
 
-	if #Reason > 50 then
+	if Reason and #Reason > 50 then
 		return "Error: Reason too long. Cap: 50chars"
 	end
 

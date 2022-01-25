@@ -189,4 +189,25 @@ function Util:WaitUntil(callbackFn: (nil) -> (nil))
 	end)
 end
 
+--[=[
+	Returns a formatted UTC date.
+
+	@return string
+]=]
+function Util:GetUTCDate(): (string)
+	local utcTime = os.date("!*t")
+
+	return utcTime.year
+		.. "-"
+		.. utcTime.month
+		.. "-"
+		.. utcTime.day
+		.. " "
+		.. utcTime.hour
+		.. ":"
+		.. utcTime.min
+		.. ":"
+		.. utcTime.sec
+end
+
 return Util

@@ -23,12 +23,13 @@ local function NoCollide(model)
 end
 
 Players.PlayerAdded:Connect(function(Player)
-	local Banned, Reason, ExecutorId, System = BanService:GetBanInfo(Player.UserId)
+	local Banned, Reason, ExecutorId, Date, System = BanService:GetBanInfo(Player.UserId)
 	if Banned then
 		return Player:Kick(
-			("\nBanned from all servers!\nModerator: %s\nReason: %s"):format(
+			("\nBanned from all servers!\nModerator: %s\nReason: %s\n%s"):format(
 				if System then "System" else Players:GetNameFromUserIdAsync(ExecutorId),
-				Reason
+				Reason,
+				Date .. " UTC"
 			)
 		)
 	end
@@ -67,6 +68,13 @@ pcall(function()
 		local playerObject = Players:GetPlayerByUserId(dataTable.UserId)
 		if playerObject then
 			playerObject:Kick(dataTable.Reason)
+		end
+	end)
+
+	Messaging:SubscribeAsync("Servers:Shutdown", function(dataTable)
+		dataTable = dataTable.Data
+		for _, b in ipairs(Players:GetPlayers()) do
+			b:Kick(dataTable.Reason)
 		end
 	end)
 end)
