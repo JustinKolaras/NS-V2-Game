@@ -19,7 +19,7 @@ return function(Context, Victim, Reason)
 		return "Error: Reason too long. Cap: 85chars"
 	end
 
-	Victim:Kick("\nKicked\nModerator: %s\nReason: %s"):format(Executor.Name, tostring(Reason))
+	Victim:Kick(("\nKicked\nModerator: %s\nReason: %s"):format(Executor.Name, Reason))
 
 	return ("Kicked %s (%s) successfully."):format(Victim.Name, Victim.UserId)
 end
