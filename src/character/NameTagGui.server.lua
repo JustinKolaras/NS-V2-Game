@@ -1,3 +1,5 @@
+-- This script is old. I edited it a lot since its first version but it's still icky.
+
 task.wait()
 
 local Market = game:GetService("MarketplaceService")
