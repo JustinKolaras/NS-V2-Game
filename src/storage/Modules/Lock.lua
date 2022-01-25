@@ -6,6 +6,7 @@ local moduleSettings = {
 	contextExecutor = nil,
 }
 
+-- Returns an error of type string if there is any. If there is no error, nothing is returned.
 function ServerLock:Lock(reason: string, executor: Player): (string?)
 	if moduleSettings.isLocked and #moduleSettings.lockReason > 0 then
 		return "Already locked: "
@@ -21,6 +22,7 @@ function ServerLock:Lock(reason: string, executor: Player): (string?)
 	moduleSettings.SettingscontextExecutor = executor
 end
 
+-- Returns an error of type string if there is any. If there is no error, nothing is returned.
 function ServerLock:Unlock(): (string?)
 	if not moduleSettings.isLocked then
 		return "Not locked."
@@ -30,6 +32,7 @@ function ServerLock:Unlock(): (string?)
 	moduleSettings.contextExecutor = nil
 end
 
+-- Returns a tuple: isLocked: bool, lockReason: string, executor: Player | nil
 function ServerLock:Status(): (boolean, string, Player | nil)
 	return moduleSettings.isLocked, moduleSettings.lockReason, moduleSettings.contextExecutor
 end
