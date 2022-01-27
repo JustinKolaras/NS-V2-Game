@@ -11,6 +11,9 @@
 	Array<{isBanned: bool, banReason: string, executorId: PlayerUserId | string<"System">, date: string, isSystem: bool}>
 ]]
 
+-- At the moment there are multiple type errors with this script, which will be fixed
+-- as soon as possible.
+
 local banService = {}
 
 --
