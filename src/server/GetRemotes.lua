@@ -18,16 +18,6 @@ return function()
 		local ok, err = pcall(function()
 			data = Http:GetAsync(Endpoints.OUTBOUND_BANS)
 		end)
-		--[[
-            "data" is an array of post requests recently set to the endpoint
-            [
-                {
-                    toBanID: 0, - ID of the player to ban
-                    reason: "", - The reason for banning this player of type string
-                    executor: 0, - The ID of the player executing the action 
-                }
-            ]
-        ]]
 		if ok then
 			for _, dict in ipairs(data) do
 				-- Add to Roblox DataStore
