@@ -12,7 +12,7 @@ Physics:CollisionGroupSetCollidable("p", "p", false)
 local BanService = require(ServerStorage.Storage.Modules.BanService)
 local Lock = require(ServerStorage.Storage.Modules.Lock)
 
-require(script.Parent.GetRemotes)()
+-- require(script.Parent.GetRemotes)()
 
 local SetCoreEvent = ReplicatedStorage:WaitForChild("Events").SetCore
 
