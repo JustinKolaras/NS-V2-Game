@@ -19,18 +19,24 @@ return function()
 			data = Http:GetAsync(Endpoints.OUTBOUND_BANS)
 		end)
 		if ok then
-			for _, dict in ipairs(data) do
+			data = Http:JSONDecode(data)
+			if (data.status ~= "ok") then
+				error(data.error)
+			end
+			for _, dict in ipairs(data.data) do
+				local id, reason, executor = unpack(dict)
+
 				-- Add to Roblox DataStore
 				local date = Util:GetUTCDate() .. " UTC"
-				local bsErr = BanService:Add(dict.toBanID, dict.executor, dict.reason, date)
-				if bsErr then
+				local banServiceError = BanService:Add(id, executor, reason, date)
+				if banServiceError then
 					error(bsErr)
 				end
 
 				-- Kick if in-game
 				local Format = ("\nBanned from all servers!\nModerator: %s\nReason: %s\n%s"):format(
 					Players:GetNameFromUserIdAsync(dict.executor),
-					dict.reason,
+					reason,
 					date
 				)
 
