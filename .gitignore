@@ -5,5 +5,5 @@
 /*.rbxlx.lock
 /*.rbxl.lock
 
-# Private NS .env File
-env.lua
+# Private NS Secrets File
+secrets.lua

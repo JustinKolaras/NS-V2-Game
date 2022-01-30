@@ -5,63 +5,57 @@ local Players = game:GetService("Players")
 
 local BanService = require(ServerStorage.Storage.Modules.BanService)
 local Util = require(ReplicatedStorage.Shared.Util)
-local env = require(ServerStorage.Storage.Modules.env)
+local secrets = require(ServerStorage.Storage.Modules.secrets)
 
 local Endpoints = {
-	OUTBOUND_BANS = "https://NS/api/remote/outbound/bans",
-	DELETE_OUTBOUND_BAN = "https://NS/api/remote/outbound/bans/%d",
+	OUTBOUND_BANS = "https://ns-api-nnrz4.ondigitalocean.app/api/remote/outbound/bans",
+	DELETE_OUTBOUND_BAN = "https://ns-api-nnrz4.ondigitalocean.app/api/remote/outbound/bans/%d",
 }
 
 return function()
 	while true do
-		local data
-		local ok, err = pcall(function()
-			data = Http:GetAsync(Endpoints.OUTBOUND_BANS)
-		end)
-		if ok then
-			data = Http:JSONDecode(data)
-			if (data.status ~= "ok") then
-				error(data.error)
-			end
+		local data = Http:GetAsync(Endpoints.OUTBOUND_BANS, false, {
+			["Authorization"] = secrets["NS_API_AUTHORIZATION"],
+		})
+		data = Http:JSONDecode(data)
+		if data.status == "ok" then
 			for _, dict in ipairs(data.data) do
-				local id, reason, executor = unpack(dict)
+				local id, reason, executor = dict.toBanID, dict.reason, dict.executor
 
 				-- Add to Roblox DataStore
 				local date = Util:GetUTCDate() .. " UTC"
 				local banServiceError = BanService:Add(id, executor, reason, date)
 				if banServiceError then
-					error(bsErr)
+					error(banServiceError)
 				end
 
 				-- Kick if in-game
 				local Format = ("\nBanned from all servers!\nModerator: %s\nReason: %s\n%s"):format(
-					Players:GetNameFromUserIdAsync(dict.executor),
+					Players:GetNameFromUserIdAsync(executor),
 					reason,
 					date
 				)
 
-				local playerObject = Players:GetPlayerByUserId(dict.toBanID)
+				local playerObject = Players:GetPlayerByUserId(id)
 				if playerObject then
 					playerObject:Kick(Format)
 				end
 
 				-- Send delete request
 				local function requestDelete()
-					pcall(function()
-						Http:RequestAsync({
-							Url = Endpoints.DELETE_OUTBOUND_BAN:format(dict.toBanID),
-							Method = "DELETE",
-							Headers = {
-								["Authorization"] = env["NS_API_AUTHORIZATION"],
-							},
-						})
-					end)
+					Http:RequestAsync({
+						Url = Endpoints.DELETE_OUTBOUND_BAN:format(id),
+						Method = "DELETE",
+						Headers = {
+							["Authorization"] = secrets["NS_API_AUTHORIZATION"],
+						},
+					})
 				end
 
 				task.delay(1, requestDelete)
 			end
 		else
-			error(err)
+			error(data.error)
 		end
 		task.wait(20)
 	end
