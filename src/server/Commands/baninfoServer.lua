@@ -17,7 +17,7 @@ return function(Context, Player)
 
 	return ('%s was banned on %s by %s for: "%s"'):format(
 		Players:GetNameFromUserIdAsync(Player),
-		Date .. " UTC",
+		Date,
 		if System then "System" else Players:GetNameFromUserIdAsync(ExecutorId),
 		BanReason
 	)
