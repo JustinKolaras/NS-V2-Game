@@ -11,9 +11,6 @@
 	Array<{isBanned: bool, banReason: string, executorId: PlayerUserId | string<"System">, date: string, isSystem: bool}>
 ]]
 
--- At the moment there are multiple type errors with this script, which will be fixed
--- as soon as possible.
-
 local banService = {}
 
 --
@@ -54,7 +51,7 @@ local retry = setmetatable({}, makeLibraryMeta("retry"))
 
 function retry.Set(dataStore: DataStore, dataKey: string, count: number, data: any)
 	return Promise.new(function(resolve, reject)
-		count = tonumber(count)
+		count = tonumber(count) or 5
 		local ok, result
 		for _ = 1, count do
 			ok, result = pcall(dataStore.SetAsync, dataStore, dataKey, data)
@@ -71,7 +68,7 @@ end
 
 function retry.Get(dataStore: DataStore, dataKey: string, count: number)
 	return Promise.new(function(resolve, reject)
-		count = tonumber(count)
+		count = tonumber(count) or 5
 		local ok, result, data
 		for _ = 1, count do
 			ok, result = pcall(function()
@@ -90,7 +87,7 @@ end
 
 function retry.Remove(dataStore: DataStore, dataKey: string, count: number)
 	return Promise.new(function(resolve, reject)
-		count = tonumber(count)
+		count = tonumber(count) or 5
 		local ok, result
 		for _ = 1, count do
 			ok, result = pcall(dataStore.RemoveAsync, dataStore, dataKey)
@@ -108,7 +105,7 @@ end
 --
 
 -- Returns an error of type string if there is any. If there is no error, nothing is returned.
-function banService:Add(Id: number, Executor: number, Reason: string | number, Date: string): (string?)
+function banService:Add(Id: number, Executor: number, Reason: string | number, Date: string)
 	local ok, Err = pcall(BanStore.SetAsync, BanStore, Settings.storeKey .. Id, { true, Executor, Reason, Date })
 	if not ok then
 		retry.Set(BanStore, Settings.storeKey .. Id, 5, { true, Executor, Reason, Date })
@@ -123,7 +120,7 @@ function banService:Add(Id: number, Executor: number, Reason: string | number, D
 end
 
 -- Returns an error of type string if there is any. If there is no error, nothing is returned.
-function banService:Remove(Id: number): (string?)
+function banService:Remove(Id: number)
 	local ok, Err = pcall(BanStore.RemoveAsync, BanStore, Settings.storeKey .. Id)
 	if not ok then
 		retry.Remove(BanStore, Settings.storeKey .. Id, 5)
@@ -138,7 +135,7 @@ function banService:Remove(Id: number): (string?)
 end
 
 -- Returns a tuple: isBanned: bool, banReason: string, executorId: number | string<"System">, isSystem: bool
-function banService:GetBanInfo(Id: number): (boolean, string, number, string, boolean)
+function banService:GetBanInfo(Id: number)
 	local isBanned, executorId, banReason, date, isSystem
 
 	local ok, Err = pcall(function()
@@ -162,6 +159,8 @@ function banService:GetBanInfo(Id: number): (boolean, string, number, string, bo
 	end
 
 	isSystem = executorId == "System"
+
+	print(isBanned, banReason, executorId, date, isSystem)
 
 	return isBanned, banReason, executorId, date, isSystem
 end

@@ -29,6 +29,8 @@ return function()
 					error(banServiceError)
 				end
 
+				task.wait(1)
+
 				-- Kick if in-game
 				local Format = ("\nBanned from all servers!\nModerator: %s\nReason: %s\n%s"):format(
 					Players:GetNameFromUserIdAsync(executor),
@@ -57,6 +59,6 @@ return function()
 		else
 			error(data.error)
 		end
-		task.wait(20)
+		task.wait(5)
 	end
 end
