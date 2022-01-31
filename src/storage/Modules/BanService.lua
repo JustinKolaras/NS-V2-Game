@@ -160,8 +160,6 @@ function banService:GetBanInfo(Id: number)
 
 	isSystem = executorId == "System"
 
-	print(isBanned, banReason, executorId, date, isSystem)
-
 	return isBanned, banReason, executorId, date, isSystem
 end
 
