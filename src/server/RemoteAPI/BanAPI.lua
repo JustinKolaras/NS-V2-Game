@@ -22,6 +22,12 @@ return function()
 			for _, dict in ipairs(data.data) do
 				local id, reason, executor = dict.toBanID, dict.reason, dict.executor
 
+				-- Check if ban exists already
+				local Banned = BanService:GetBanInfo(id)
+				if Banned then
+					return
+				end
+
 				-- Add to Roblox DataStore
 				local date = Util:GetUTCDate() .. " UTC"
 				local banServiceError = BanService:Add(id, executor, reason, date)
