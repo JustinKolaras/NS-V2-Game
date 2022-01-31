@@ -14,6 +14,12 @@ local Lock = require(ServerStorage.Storage.Modules.Lock)
 
 local SetCoreEvent = ReplicatedStorage:WaitForChild("Events").SetCore
 
+-- Initiate API
+local RemoteAPIFolder = script.Parent.RemoteAPI
+for _, b in ipairs(RemoteAPIFolder:GetChildren()) do
+	task.defer(require(b))
+end
+
 local function NoCollide(model)
 	for _, v in next, model:GetChildren() do
 		if v:IsA("BasePart") then
@@ -78,9 +84,3 @@ pcall(function()
 		end
 	end)
 end)
-
--- Initiate API
-local RemoteAPIFolder = script.Parent.RemoteAPI
-for _, b in ipairs(RemoteAPIFolder:GetChildren()) do
-	require(b)()
-end
