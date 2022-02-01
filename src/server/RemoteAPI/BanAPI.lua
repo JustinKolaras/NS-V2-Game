@@ -10,6 +10,7 @@ local secrets = require(ServerStorage.Storage.Modules.secrets)
 local Endpoints = {
 	OUTBOUND_BANS = "https://ns-api-nnrz4.ondigitalocean.app/api/remote/outbound/bans",
 	DELETE_OUTBOUND_BAN = "https://ns-api-nnrz4.ondigitalocean.app/api/remote/outbound/bans/%d",
+	OUTBOUND_UNBANS = "https://ns-api-nnrz4.ondigitalocean.app/api/remote/outbound/unbans",
 }
 
 return function()
@@ -21,6 +22,17 @@ return function()
 		if data.status == "ok" then
 			for _, dict in ipairs(data.data) do
 				local id, reason, executor = dict.toBanID, dict.reason, dict.executor
+
+				-- If they have an outgoing unban, we want to ignore them entirely
+				local unbanData = Http:GetAsync(Endpoints.OUTBOUND_UNBANS, false, {
+					["Authorization"] = secrets["NS_API_AUTHORIZATION"],
+				})
+				unbanData = Http:JSONDecode(unbanData)
+				for _, uDict in ipairs(unbanData.data) do
+					if uDict.toUnbanID == id then
+						return
+					end
+				end
 
 				-- Check if ban exists already
 				local Banned = BanService:GetBanInfo(id)
