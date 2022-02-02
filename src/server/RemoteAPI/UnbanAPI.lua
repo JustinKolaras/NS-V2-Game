@@ -19,16 +19,12 @@ return function()
 			for _, dict in ipairs(data.data) do
 				local id = dict.toUnbanID
 
-				-- Check to see that a ban exists
-				local Banned = BanService:GetBanInfo(id)
-				if not Banned then
-					return
-				end
+				-- If the ban doesn't exist, we still will want to remove it.
 
 				-- Remove from Roblox DataStore
 				local banServiceError = BanService:Remove(id)
 				if banServiceError then
-					error(banServiceError)
+					warn(banServiceError)
 				end
 
 				task.wait(1)
