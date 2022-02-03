@@ -174,8 +174,6 @@ function Time.Forget(): ()
 	table.remove(clientConfig.loadingTimes, 1)
 end
 
--- It's a comment!
-
 function Templates.New(Shirt: number, Pant: number): ({ [string]: number })
 	return {
 		TemplateS = Shirt,
