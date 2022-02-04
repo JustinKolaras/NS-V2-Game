@@ -12,7 +12,8 @@ Physics:CollisionGroupSetCollidable("p", "p", false)
 local BanService = require(ServerStorage.Storage.Modules.BanService)
 local Lock = require(ServerStorage.Storage.Modules.Lock)
 
-local SetCoreEvent = ReplicatedStorage:WaitForChild("Events").SetCore
+ReplicatedStorage:WaitForChild("Events")
+local SetCoreEvent = ReplicatedStorage.Events:FindFirstChild("SetCore")
 
 -- Initiate API
 local RemoteAPIFolder = script.Parent.RemoteAPI
@@ -35,7 +36,7 @@ Players.PlayerAdded:Connect(function(Player)
 			("\nBanned from all servers!\nModerator: %s\nReason: %s\n%s"):format(
 				if System then "System" else Players:GetNameFromUserIdAsync(ExecutorId),
 				Reason,
-				Date .. " UTC"
+				Date
 			)
 		)
 	end

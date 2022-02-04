@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TextService = game:GetService("TextService")
 
-local Event = ReplicatedStorage.Events:FindFirstChild("Cmdr-Connection")
+local Event = ReplicatedStorage.Events:FindFirstChild("Hint")
 
 return function(Context, Text)
 	if not Text then

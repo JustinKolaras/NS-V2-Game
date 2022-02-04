@@ -190,6 +190,24 @@ function Util:WaitUntil(callbackFn: (nil) -> (nil))
 end
 
 --[=[
+	Prefaces numbers under the select digit count with zeros.
+	i.e Calling this function with a digit count of 2 and a number of "1" will return "01"
+
+	@param transformer number -- The number to transform
+	@param digitCount number -- The digits to return
+	@return number
+]=]
+function Util:PrefaceZeroes(transformer: number, digitCount: number): (number)
+	local newNumber = transformer
+
+	while #tostring(newNumber) < digitCount do
+		newNumber = 0 .. newNumber
+	end
+
+	return newNumber
+end
+
+--[=[
 	Returns a formatted UTC date.
 
 	@return string
@@ -199,15 +217,15 @@ function Util:GetUTCDate(): (string)
 
 	return utcTime.year
 		.. "-"
-		.. utcTime.month
+		.. Util:PrefaceZeroes(utcTime.month, 2)
 		.. "-"
-		.. utcTime.day
+		.. Util:PrefaceZeroes(utcTime.day, 2)
 		.. " "
-		.. utcTime.hour
+		.. Util:PrefaceZeroes(utcTime.hour, 2)
 		.. ":"
-		.. utcTime.min
+		.. Util:PrefaceZeroes(utcTime.min, 2)
 		.. ":"
-		.. utcTime.sec
+		.. Util:PrefaceZeroes(utcTime.sec, 2)
 end
 
 return Util

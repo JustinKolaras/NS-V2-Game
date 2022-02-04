@@ -10,7 +10,7 @@ if not Gui then
 	until Gui ~= nil
 end
 
-local Event = ReplicatedStorage.Events:FindFirstChild("Cmdr-Connection")
+local Event = ReplicatedStorage.Events:FindFirstChild("Hint")
 
 local HintGui = Gui:WaitForChild("Hint")
 local ClipFrame = HintGui:WaitForChild("Clip")
@@ -32,7 +32,7 @@ local inactiveTime = 60
 
 local automatic = true
 
-function Hint(Text)
+local function Hint(Text)
 	if ClipFrame.Position ~= UDim2.new(0, 0, -0.5, 0) then
 		ClipFrame.Position = UDim2.new(0, 0, -0.5, 0)
 	end
@@ -83,7 +83,7 @@ task.spawn(function()
 				end
 			end
 			local Chosen = Hints[math.random(1, #Hints)]
-			Hint(Chosen, false)
+			Hint(Chosen)
 			for a, b in ipairs(Hints) do
 				if b == Chosen then
 					table.insert(Clearing, b)
