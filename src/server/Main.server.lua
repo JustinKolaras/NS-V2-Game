@@ -18,7 +18,7 @@ local SetCoreEvent = ReplicatedStorage.Events:FindFirstChild("SetCore")
 -- Initiate API
 local RemoteAPIFolder = script.Parent.RemoteAPI
 for _, b in ipairs(RemoteAPIFolder:GetChildren()) do
-	task.defer(require(b))
+	task.spawn(require(b))
 end
 
 local function NoCollide(model)
@@ -32,6 +32,7 @@ end
 Players.PlayerAdded:Connect(function(Player)
 	local Banned, Reason, ExecutorId, Date, System = BanService:GetBanInfo(Player.UserId)
 	if Banned then
+		print("Kicked (but didn't)")
 		return Player:Kick(
 			("\nBanned from all servers!\nModerator: %s\nReason: %s\n%s"):format(
 				if System then "System" else Players:GetNameFromUserIdAsync(ExecutorId),
@@ -40,7 +41,6 @@ Players.PlayerAdded:Connect(function(Player)
 			)
 		)
 	end
-
 	local lockStatus, lockReason = Lock:Status()
 	if lockStatus then
 		if Player:GetRankInGroup(8046949) < 252 then -- Game mods are immune
