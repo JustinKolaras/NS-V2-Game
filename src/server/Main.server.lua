@@ -43,7 +43,9 @@ Players.PlayerAdded:Connect(function(Player)
 
 	local lockStatus, lockReason = Lock:Status()
 	if lockStatus then
-		return Player:Kick(if #lockReason > 0 then "\nLocked\n" .. lockReason else "This server is locked.")
+		if Player:GetRankInGroup(8046949) < 252 then -- Game mods are immune
+			return Player:Kick(if #lockReason > 0 then "\nLocked\n" .. lockReason else "This server is locked.")
+		end
 	end
 
 	local connection
