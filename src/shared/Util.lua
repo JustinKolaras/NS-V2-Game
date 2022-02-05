@@ -228,4 +228,17 @@ function Util:GetUTCDate(): (string)
 		.. Util:PrefaceZeroes(utcTime.sec, 2)
 end
 
+--[=[
+	Requires the specified value to meet callback function criteria.
+	If the callback function returns a truthy value, the value will be returned back.
+	Otherwise, nil will be returned.
+
+	@param item any -- The item to inspect
+	@param callbackFn function -- The callback function to return at (must return a boolean)
+	@return any | nil
+]=]
+function Util:Inspect(item: any, callbackFn: (nil) -> (boolean)): (any | nil)
+	return if callbackFn() then item else nil
+end
+
 return Util

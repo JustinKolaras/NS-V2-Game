@@ -32,7 +32,6 @@ end
 Players.PlayerAdded:Connect(function(Player)
 	local Banned, Reason, ExecutorId, Date, System = BanService:GetBanInfo(Player.UserId)
 	if Banned then
-		print("Kicked (but didn't)")
 		return Player:Kick(
 			("\nBanned from all servers!\nModerator: %s\nReason: %s\n%s"):format(
 				if System then "System" else Players:GetNameFromUserIdAsync(ExecutorId),
