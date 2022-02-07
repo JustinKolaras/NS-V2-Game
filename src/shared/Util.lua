@@ -126,7 +126,7 @@ end
 function Util:Create(Object: string, Properties: { [string]: any }?): (Instance)
 	local toReturn = Instance.new(Object)
 	if Properties then
-		for a, b in pairs(Properties) do
+		for a : string, b : any in pairs(Properties) do
 			toReturn[a] = b
 		end
 	end
@@ -143,7 +143,7 @@ end
 function Util:Clone(Object: Instance, Properties: { [string]: any }?): (Instance)
 	local toReturn = Object:Clone()
 	if Properties then
-		for a, b in pairs(Properties) do
+		for a : string, b : any in pairs(Properties) do
 			toReturn[a] = b
 		end
 	end
@@ -160,7 +160,7 @@ end
 	@return void
 ]=]
 function Util:MoveChildren(Previous: Instance, Next: Instance, shouldDelete: boolean?): ()
-	for _, b in ipairs(Previous:GetChildren()) do
+	for _, b : Instance in ipairs(Previous:GetChildren()) do
 		b.Parent = Next
 	end
 	if shouldDelete then
