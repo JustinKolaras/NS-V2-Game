@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 
 return {
 	Name = "clear",
-	Aliases = {},
+	Aliases = { "clr", "cls", "c" },
 	Description = "Clear all lines above the entry line of the Cmdr window.",
 	Group = "Util",
 	Args = {},
