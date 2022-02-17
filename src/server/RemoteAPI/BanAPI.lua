@@ -59,7 +59,7 @@ return function()
 				-- Add to Roblox DataStore
 				local date = Util:GetUTCDate() .. " UTC"
 				local banServiceError = promisify(function()
-					BanService:Add(id, executor, reason, date)
+					return BanService:Add(id, executor, reason, date)
 				end)():await()
 				if banServiceError then
 					error(banServiceError)

@@ -29,7 +29,7 @@ return function()
 
 				-- Send delete request
 				promisify(function()
-					Http:RequestAsync({
+					return Http:RequestAsync({
 						Url = Endpoints.DELETE_OUTBOUND_UNBAN:format(id),
 						Method = "DELETE",
 						Headers = {
@@ -40,7 +40,7 @@ return function()
 
 				-- Remove from Roblox DataStore
 				local banServiceError = promisify(function()
-					BanService:Remove(id)
+					return BanService:Remove(id)
 				end)():await()
 				if banServiceError then
 					warn(banServiceError)
