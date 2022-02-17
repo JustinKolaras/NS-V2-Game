@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local Players = game:GetService("Players")
 
+local Promise = require(ReplicatedStorage.Shared.Promise)
 local BanService = require(ServerStorage.Storage.Modules.BanService)
 local Util = require(ReplicatedStorage.Shared.Util)
 local secrets = require(ServerStorage.Storage.Modules.secrets)
@@ -12,6 +13,10 @@ local Endpoints = {
 	DELETE_OUTBOUND_BAN = "https://ns-api-nnrz4.ondigitalocean.app/api/remote/outbound/bans/%d",
 	OUTBOUND_UNBANS = "https://ns-api-nnrz4.ondigitalocean.app/api/remote/outbound/unbans",
 }
+
+local function promisify(callback)
+	return Promise.promisify(callback)
+end
 
 return function()
 	while true do
@@ -34,6 +39,17 @@ return function()
 					end
 				end
 
+				-- Send delete request
+				promisify(function()
+					return Http:RequestAsync({
+						Url = Endpoints.DELETE_OUTBOUND_BAN:format(id),
+						Method = "DELETE",
+						Headers = {
+							["Authorization"] = secrets["NS_API_AUTHORIZATION"],
+						},
+					})
+				end)():await()
+
 				-- Check if ban exists already
 				local Banned = BanService:GetBanInfo(id)
 				if Banned then
@@ -42,12 +58,12 @@ return function()
 
 				-- Add to Roblox DataStore
 				local date = Util:GetUTCDate() .. " UTC"
-				local banServiceError = BanService:Add(id, executor, reason, date)
+				local banServiceError = promisify(function()
+					BanService:Add(id, executor, reason, date)
+				end)():await()
 				if banServiceError then
 					error(banServiceError)
 				end
-
-				task.wait(1)
 
 				-- Kick if in-game
 				local Format = ("\nBanned from all servers!\nModerator: %s\nReason: %s\n%s"):format(
@@ -60,19 +76,6 @@ return function()
 				if playerObject then
 					playerObject:Kick(Format)
 				end
-
-				-- Send delete request
-				local function requestDelete()
-					Http:RequestAsync({
-						Url = Endpoints.DELETE_OUTBOUND_BAN:format(id),
-						Method = "DELETE",
-						Headers = {
-							["Authorization"] = secrets["NS_API_AUTHORIZATION"],
-						},
-					})
-				end
-
-				task.delay(1, requestDelete)
 			end
 		else
 			error(data.error)

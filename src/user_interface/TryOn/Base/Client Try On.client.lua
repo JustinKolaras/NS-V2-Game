@@ -630,7 +630,8 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 	local Data = { ... }
 	if Key == "Open" then
 		clientConfig._promise.mainLoad = Promise.new(function(_, _, onCancel)
-			if Base.Visible or Notice.Visible or clientConfig.isAdvancedView or clientConfig._db.openBase then
+			local Conditions = { Base.Visible, Notice.Visible, clientConfig.isAdvancedView, clientConfig._db.openBase }
+			if Util:Logical_Any(Conditions) then
 				return
 			end
 

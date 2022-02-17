@@ -238,8 +238,48 @@ end
 	@param callbackFn function -- The callback function to return at (must return a boolean)
 	@return any | nil
 ]=]
-function Util:Inspect(item: any, callbackFn: (nil) -> (boolean)): (any | nil)
+function Util:Inspect(item: any, callbackFn: (nil) -> (boolean)): (any)
 	return if callbackFn() then item else nil
+end
+
+--[=[
+	Cycles through an array of booleans.
+	If all booleans meet the conditioner, this function returns true.
+
+	@param looper array -- The array to loop through
+	@param conditioner boolean | function -- The conditions to meet
+	@return boolean
+]=]
+function Util:Logical_All(looper: { boolean }, conditioner: boolean | (nil) -> (boolean)): (boolean)
+	local function Validate(value)
+		if typeof(conditioner) == "function" then
+			return conditioner(value)
+		else
+			return conditioner
+		end
+	end
+	for _, val in ipairs(looper) do
+		if not Validate(val) then
+			return false
+		end
+	end
+	return true
+end
+
+--[=[
+	Cycles through an array of booleans.
+	If any boolean is true, this function returns true.
+
+	@param looper array -- The array to loop through
+	@return boolean
+]=]
+function Util:Logical_Any(looper: { boolean }): (boolean)
+	for _, val in ipairs(looper) do
+		if val then
+			return true
+		end
+	end
+	return false
 end
 
 return Util
