@@ -51,7 +51,9 @@ return function()
 				end)():await()
 
 				-- Check if ban exists already
-				local Banned = BanService:GetBanInfo(id)
+				local Banned = promisify(function()
+					return BanService:GetBanInfo(id)
+				end)():await()
 				if Banned then
 					return
 				end
