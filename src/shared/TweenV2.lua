@@ -1,4 +1,4 @@
--- WIP
+-- A library by Aerosphia for easier tweening and promise integration.
 
 local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
