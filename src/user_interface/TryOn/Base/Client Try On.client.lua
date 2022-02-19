@@ -20,15 +20,6 @@ local Promise = require(ReplicatedStorage.Shared.Promise)
 local Util = require(ReplicatedStorage.Shared.Util)
 
 local Gui = Player.PlayerGui
-if not Gui then
-	Util
-		:WaitUntil(function()
-			return Gui ~= nil
-		end)
-		:timeout(5)
-		:catch(error)
-		:await()
-end
 
 local ScreenGui = Gui.TryOn
 
@@ -62,7 +53,7 @@ local viewportCharacter = TryOnFolder:FindFirstChild("Character")
 
 local clientConfig = setmetatable({
 	key = 0,
-	templatePrefix = "http://www.roblox.com/asset/?id=%d",
+	templatePrefix = 'http://www.roblox.com/asset/?id=%d',
 	buyOutfitFormat = 'Buy Outfit <font color="#3CDD52">R$%d</font>',
 	buyShirtFormat = 'Shirt <b><font color="#3CDD52">R$%d</font></b>',
 	buyPantFormat = 'Pants <b><font color="#3CDD52">R$%d</font></b>',

@@ -1,13 +1,15 @@
 -- WIP
 
 local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Promise = require(ReplicatedStorage.Shared.Promise)
 
 local TweenV2 = {}
-TweenV2.__index = TweenV2
 
-setmetatable({
+local Config = {
 	Saved = {},
-}, TweenV2)
+}
 
 -- Runs a tween as soon as possible
 -- Also runs a "Later" tween
@@ -22,17 +24,35 @@ setmetatable({
         _ID = ...
     })
 ]]
-function TweenV2:Now(options: { [string]: any }): (Tween)
-	local tweenID = options["_ID"]
-	if tweenID then
-		if self.Saved[tweenID] then
-			local savedOptions = self.Saved[tweenID]
-			return TweenService:Create(savedOptions.Part, savedOptions.Info, savedOptions.Properties):Play()
-		else
-			error("TweenV2 (function 'Now'): Could not find predefined ID")
+function TweenV2:Now(options: { [string]: any })
+	return Promise.new(function(resolve, reject, onCancel)
+		local tweenID = options["_ID"]
+		if tweenID then
+			if Config.Saved[tweenID] then
+				local savedOptions = Config.Saved[tweenID]
+				local Tween = TweenService:Create(savedOptions.Object, savedOptions.Info, savedOptions.Properties)
+
+				onCancel(function()
+					Tween:Cancel()
+				end)
+
+				Tween.Completed:Connect(resolve)
+				Tween:Play()
+				return
+			else
+				reject("TweenV2 (function 'Now'): Could not find predefined ID")
+			end
 		end
-	end
-	return TweenService:Create(options.Part, options.Info, options.Properties):Play()
+
+		local Tween = TweenService:Create(options.Object, options.Info, options.Properties)
+
+		onCancel(function()
+			Tween:Cancel()
+		end)
+
+		Tween.Completed:Connect(resolve)
+		Tween:Play()
+	end)
 end
 
 -- Defines a tween and saves it for later, without running it
@@ -46,12 +66,12 @@ end
         }
     })
 ]]
-function TweenV2:Later(options: { [string]: any })
+function TweenV2:Later(options: { [string]: any }): (nil)
 	local tweenID = options["_ID"]
-	if self.Saved[tweenID] then
+	if Config.Saved[tweenID] then
 		error("TweenV2 (function 'Later'): Attempt to call Later on an already saved ID")
 	end
-	self.Saved[tweenID] = options.Options
+	Config.Saved[tweenID] = options.Options
 end
 
 -- Runs a tween as soon as possible, and also saves it for later for future use
@@ -65,8 +85,29 @@ end
         }
     })
 ]]
-function TweenV2:NowAndSave(options: { [string]: any }) 
+function TweenV2:NowAndSave(options: { [string]: any })
+	return Promise.new(function(resolve, reject, onCancel)
+		local tweenID = options["_ID"]
+		if tweenID then
+			if Config.Saved[tweenID] then
+				reject("TweenV2 (function 'NowAndSave'): Attempt to call NowAndSave on an already saved ID")
+			else
+				local tweenOptions = options.Options
+				Config.Saved[tweenID] = tweenOptions
 
+				local Tween = TweenService:Create(tweenOptions.Object, tweenOptions.Info, tweenOptions.Properties)
+
+				onCancel(function()
+					Tween:Cancel()
+				end)
+
+				Tween.Completed:Connect(resolve)
+				Tween:Play()
+			end
+		else
+			reject("TweenV2 (function 'NowAndSave'): Attempt to call NowAndSave without ID")
+		end
+	end)
 end
 
 -- Deletes a saved tween
@@ -75,4 +116,12 @@ end
         _ID = ...
     })
 ]]
-function TweenV2:Delete(options: { [string]: any }) end
+function TweenV2:Delete(options: { [string]: any }): (nil)
+	local tweenID = options["_ID"]
+	if not Config.Saved[tweenID] then
+		error("TweenV2 (function 'Delete'): Attempt to call Delete on invalid ID")
+	end
+	Config.Saved[tweenID] = nil
+end
+
+return TweenV2

@@ -247,15 +247,17 @@ end
 	If all booleans meet the conditioner, this function returns true.
 
 	@param looper array -- The array to loop through
-	@param conditioner boolean | function -- The conditions to meet
+	@param conditioner? boolean | function -- The conditions to meet (defaults to true)
 	@return boolean
 ]=]
-function Util:Logical_All(looper: { boolean }, conditioner: boolean | (nil) -> (boolean)): (boolean)
+function Util:Logical_All(looper: { boolean }, conditioner: boolean | (nil) -> (boolean)?): (boolean)
 	local function Validate(value)
 		if typeof(conditioner) == "function" then
 			return conditioner(value)
-		else
+		elseif conditioner then
 			return conditioner
+		else
+			return true
 		end
 	end
 	for _, val in ipairs(looper) do
@@ -268,14 +270,24 @@ end
 
 --[=[
 	Cycles through an array of booleans.
-	If any boolean is true, this function returns true.
+	If any boolean meets the conditioner, this function returns true.
 
 	@param looper array -- The array to loop through
+	@param conditioner? boolean | function -- The conditions to meet (defaults to true)
 	@return boolean
 ]=]
-function Util:Logical_Any(looper: { boolean }): (boolean)
+function Util:Logical_Any(looper: { boolean }, conditioner: boolean | (nil) -> (boolean)?): (boolean)
+	local function Validate(value)
+		if typeof(conditioner) == "function" then
+			return conditioner(value)
+		elseif conditioner then
+			return conditioner
+		else
+			return true
+		end
+	end
 	for _, val in ipairs(looper) do
-		if val then
+		if Validate(val) then
 			return true
 		end
 	end
