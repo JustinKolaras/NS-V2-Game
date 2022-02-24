@@ -37,9 +37,9 @@ return function(Context, Victim, Reason)
 		Date .. " UTC"
 	)
 
-	local err = BanService:Add(Victim, Executor.UserId, Reason, Date)
-	if err then
-		return "Error: " .. tostring(err)
+	local apiResult = BanService:Add(Victim, Executor.UserId, Reason, Date)
+	if apiResult.status == "error" then
+		return "Error: " .. apiResult.error
 	end
 
 	Messaging:PublishAsync("Servers:Kick", {

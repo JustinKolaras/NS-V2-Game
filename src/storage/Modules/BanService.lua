@@ -18,7 +18,7 @@ local banService = {}
 local RunService = game:GetService("RunService")
 
 if RunService:IsClient() then
-	error("BanService is somehow running on the client!")
+	error("BanService is somehow running on a client!")
 end
 
 local DataStoreService = game:GetService("DataStoreService")
@@ -104,7 +104,8 @@ end
 
 --
 
--- Returns an error of type string if there is any. If there is no error, nothing is returned.
+-- Returns an object of 'status' and 'error' where 'status' is always 'ok' or 'error'.
+-- 'error' is provided if there was an error with the execution.
 function banService:Add(Id: number, Executor: number, Reason: string | number, Date: string)
 	local ok, Err = pcall(BanStore.SetAsync, BanStore, Settings.storeKey .. Id, { true, Executor, Reason, Date })
 	if not ok then
@@ -114,12 +115,14 @@ function banService:Add(Id: number, Executor: number, Reason: string | number, D
 			end)
 			:await()
 		if Err then
-			return tostring(Err)
+			return { status = "error", error = tostring(Err) }
 		end
 	end
+	return { status = "ok" }
 end
 
--- Returns an error of type string if there is any. If there is no error, nothing is returned.
+-- Returns an object of 'status' and 'error' where 'status' is always 'ok' or 'error'.
+-- 'error' is provided if there was an error with the execution.
 function banService:Remove(Id: number)
 	local ok, Err = pcall(BanStore.RemoveAsync, BanStore, Settings.storeKey .. Id)
 	if not ok then
@@ -129,9 +132,10 @@ function banService:Remove(Id: number)
 			end)
 			:await()
 		if Err then
-			return tostring(Err)
+			return { status = "error", error = tostring(Err) }
 		end
 	end
+	return { status = "ok" }
 end
 
 -- Returns a tuple: isBanned: bool, banReason: string, executorId: number | string<"System">, isSystem: bool

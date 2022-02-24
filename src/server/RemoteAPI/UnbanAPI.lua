@@ -39,11 +39,11 @@ return function()
 				end)
 
 				-- Remove from Roblox DataStore
-				local banServiceError = promisify(function()
+				local apiResult = promisify(function()
 					return BanService:Remove(id)
 				end)():await()
-				if banServiceError then
-					warn(banServiceError)
+				if apiResult.status == "error" then
+					error(apiResult.error)
 				end
 			end
 		else

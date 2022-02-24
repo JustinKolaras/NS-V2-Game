@@ -15,9 +15,9 @@ return function(Context, Victim)
 		return "Error: " .. Players:GetNameFromUserIdAsync(Victim) .. " is not banned."
 	end
 
-	local err = BanService:Remove(Victim)
-	if err then
-		return "Error: " .. tostring(err)
+	local apiResult = BanService:Remove(Victim)
+	if apiResult.status == "error" then
+		return "Error: " .. apiResult.error
 	end
 
 	return ("Unbanned %s (%s) successfully."):format(Players:GetNameFromUserIdAsync(Victim), Victim)
