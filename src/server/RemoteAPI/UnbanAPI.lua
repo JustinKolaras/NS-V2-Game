@@ -1,8 +1,6 @@
 local Http = game:GetService("HttpService")
 local ServerStorage = game:GetService("ServerStorage")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Promise = require(ReplicatedStorage.Shared.Promise)
 local BanService = require(ServerStorage.Storage.Modules.BanService)
 local secrets = require(ServerStorage.Storage.Modules.secrets)
 
@@ -10,10 +8,6 @@ local Endpoints = {
 	OUTBOUND_UNBANS = "https://ns-api-nnrz4.ondigitalocean.app/api/remote/outbound/unbans",
 	DELETE_OUTBOUND_UNBAN = "https://ns-api-nnrz4.ondigitalocean.app/api/remote/outbound/unbans/%d",
 }
-
-local function promisify(callback)
-	return Promise.promisify(callback)
-end
 
 return function()
 	while true do
@@ -28,20 +22,16 @@ return function()
 				-- If the ban doesn't exist, we still will want to remove it.
 
 				-- Send delete request
-				promisify(function()
-					return Http:RequestAsync({
-						Url = Endpoints.DELETE_OUTBOUND_UNBAN:format(id),
-						Method = "DELETE",
-						Headers = {
-							["Authorization"] = secrets["NS_API_AUTHORIZATION"],
-						},
-					})
-				end)
+				Http:RequestAsync({
+					Url = Endpoints.DELETE_OUTBOUND_UNBAN:format(id),
+					Method = "DELETE",
+					Headers = {
+						["Authorization"] = secrets["NS_API_AUTHORIZATION"],
+					},
+				})
 
 				-- Remove from Roblox DataStore
-				local apiResult = promisify(function()
-					return BanService:Remove(id)
-				end)():await()
+				local apiResult = BanService:Remove(id)
 				if apiResult.status == "error" then
 					error(apiResult.error)
 				end

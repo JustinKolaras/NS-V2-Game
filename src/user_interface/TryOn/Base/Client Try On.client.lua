@@ -156,7 +156,7 @@ function Time.Get(): (number?)
 	local toReturn = tostring(os.clock() - loadingTimes[1])
 	toReturn = toReturn:sub(1, 3)
 
-	table.move(loadingTimes, 1, 1, select("#", archivedLoads), archivedLoads)
+	table.move(loadingTimes, 1, 1, #archivedLoads, archivedLoads)
 
 	return tonumber(toReturn)
 end
@@ -230,7 +230,7 @@ local function checkAsset(Proto: boolean, ...: number)
 				end
 			elseif typeof(Proto) == "boolean" and Proto then
 				if Market:PlayerOwnsAsset(Player, b) then
-					if a == select("#", Data) then
+					if a == #Data then
 						resolve(1)
 					end
 				else

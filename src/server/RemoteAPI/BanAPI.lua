@@ -3,7 +3,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local Players = game:GetService("Players")
 
-local Promise = require(ReplicatedStorage.Shared.Promise)
 local BanService = require(ServerStorage.Storage.Modules.BanService)
 local Util = require(ReplicatedStorage.Shared.Util)
 local secrets = require(ServerStorage.Storage.Modules.secrets)
@@ -13,10 +12,6 @@ local Endpoints = {
 	DELETE_OUTBOUND_BAN = "https://ns-api-nnrz4.ondigitalocean.app/api/remote/outbound/bans/%d",
 	OUTBOUND_UNBANS = "https://ns-api-nnrz4.ondigitalocean.app/api/remote/outbound/unbans",
 }
-
-local function promisify(callback)
-	return Promise.promisify(callback)
-end
 
 return function()
 	while true do
@@ -40,29 +35,23 @@ return function()
 				end
 
 				-- Send delete request
-				promisify(function()
-					return Http:RequestAsync({
-						Url = Endpoints.DELETE_OUTBOUND_BAN:format(id),
-						Method = "DELETE",
-						Headers = {
-							["Authorization"] = secrets["NS_API_AUTHORIZATION"],
-						},
-					})
-				end)():await()
+				Http:RequestAsync({
+					Url = Endpoints.DELETE_OUTBOUND_BAN:format(id),
+					Method = "DELETE",
+					Headers = {
+						["Authorization"] = secrets["NS_API_AUTHORIZATION"],
+					},
+				})
 
 				-- Check if ban exists already
-				local Banned = promisify(function()
-					return BanService:GetBanInfo(id)
-				end)():await()
+				local Banned = BanService:GetBanInfo(id)
 				if Banned then
 					return
 				end
 
 				-- Add to Roblox DataStore
 				local date = Util:GetUTCDate() .. " UTC"
-				local apiResult = promisify(function()
-					return BanService:Add(id, executor, reason, date)
-				end)():await()
+				local apiResult = BanService:Add(id, executor, reason, date)
 				if apiResult.status == "error" then
 					error(apiResult.error)
 				end
