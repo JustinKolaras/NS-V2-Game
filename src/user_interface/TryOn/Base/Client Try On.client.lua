@@ -18,6 +18,7 @@ local Mouse = Player:GetMouse()
 
 local Promise = require(ReplicatedStorage.Shared.Promise)
 local Util = require(ReplicatedStorage.Shared.Util)
+local Debounce = require(ReplicatedStorage.Shared.Debounce)
 
 local Gui = Player.PlayerGui
 
@@ -53,7 +54,7 @@ local viewportCharacter = TryOnFolder:FindFirstChild("Character")
 
 local clientConfig = setmetatable({
 	key = 0,
-	templatePrefix = 'http://www.roblox.com/asset/?id=%d',
+	templatePrefix = "http://www.roblox.com/asset/?id=%d",
 	buyOutfitFormat = 'Buy Outfit <font color="#3CDD52">R$%d</font>',
 	buyShirtFormat = 'Shirt <b><font color="#3CDD52">R$%d</font></b>',
 	buyPantFormat = 'Pants <b><font color="#3CDD52">R$%d</font></b>',
@@ -82,12 +83,14 @@ local clientConfig = setmetatable({
 	_promise = {
 		mainLoad = 0,
 	},
+	--[[
 	_db = {
 		openBase = false,
 		closeBase = false,
 		avTrigg = false,
 		avExit = false,
 	},
+	--]]
 	isAdvancedView = false,
 	advSpeed = 1,
 	connectionBreak3d = false,
@@ -331,10 +334,9 @@ local function close(Key: string, Type: number?): ()
 	end
 end
 
-local function err(info: string, text: string?): ()
+local function err(text: string?): ()
 	Time.Forget()
 	ErrorNotif.Visible = true
-	warn(info)
 	Loading.Text = text or clientConfig.loadErrorText
 	task.wait()
 	if stillActivated() then
@@ -446,7 +448,7 @@ local function advConnectionUnit()
 			clientConfig.advSpeed = clamped
 		end)
 		clientConfig.advExFunc = function()
-			if clientConfig._db.avExit then
+			if Debounce:State({ _ID = "advancedExit" }) then
 				return
 			end
 
@@ -462,14 +464,17 @@ local function advConnectionUnit()
 			clientConfig.previousHumanoidCF = CFrame.new()
 			Player.Character.HumanoidRootPart.Anchored = false
 
-			clientConfig._db.avTrigg = true
+			Debounce:LockState({
+				_ID = "advancedTrigger",
+				length = 2,
+				callback = function()
+					AdvTrigger.TextColor3 = Color3.fromRGB(255, 255, 255)
+					AdvTrigger.AutoButtonColor = true
+				end,
+			})
+
 			AdvTrigger.TextColor3 = clientConfig.greyOut
 			AdvTrigger.AutoButtonColor = false
-			task.delay(2, function()
-				clientConfig._db.avTrigg = false
-				AdvTrigger.TextColor3 = Color3.fromRGB(255, 255, 255)
-				AdvTrigger.AutoButtonColor = true
-			end)
 
 			close("Base", 1)
 		end
@@ -487,7 +492,7 @@ local function mainConnectionUnit(shirtObject: number, pantObject: number)
 	end
 	return Promise.new(function(resolve)
 		clientConfig._connections.terminal.close = CloseButton.MouseButton1Click:Connect(function()
-			if clientConfig._db.closeBase then
+			if Debounce:State({ _ID = "closeBase" }) then
 				return
 			end
 
@@ -579,19 +584,22 @@ local function mainConnectionUnit(shirtObject: number, pantObject: number)
 			end
 		end)
 		clientConfig._connections.adv.trigg = AdvTrigger.MouseButton1Click:Connect(function()
-			if clientConfig._db.avTrigg then
+			if Debounce:State({ _ID = "advancedTrigger" }) then
 				return
 			end
 			advConnectionUnit():catch(error):await()
 
-			clientConfig._db.avExit = true
+			Debounce:LockState({
+				_ID = "advancedExit",
+				length = 1,
+				callback = function()
+					Exit.TextColor3 = Color3.fromRGB(255, 255, 255)
+					Exit.AutoButtonColor = true
+				end,
+			})
+
 			Exit.TextColor3 = clientConfig.greyOut
 			Exit.AutoButtonColor = false
-			task.delay(1, function()
-				clientConfig._db.avExit = false
-				Exit.TextColor3 = Color3.fromRGB(255, 255, 255)
-				Exit.AutoButtonColor = true
-			end)
 
 			AdvTriggFrame.Visible = false
 			AdvView.Visible = true
@@ -621,20 +629,18 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 	local Data = { ... }
 	if Key == "Open" then
 		clientConfig._promise.mainLoad = Promise.new(function(_, _, onCancel)
-			local Conditions = { Base.Visible, Notice.Visible, clientConfig.isAdvancedView, clientConfig._db.openBase }
+			local Conditions = {
+				Base.Visible,
+				Notice.Visible,
+				clientConfig.isAdvancedView,
+				Debounce:State({ _ID = "openBase" }),
+			}
 			if Util:Logical_Any(Conditions) then
 				return
 			end
 
-			clientConfig._db.openBase = true
-			task.delay(2, function()
-				clientConfig._db.openBase = false
-			end)
-
-			clientConfig._db.closeBase = true
-			task.delay(1, function()
-				clientConfig._db.closeBase = false
-			end)
+			Debounce:LockState({ _ID = "openBase", length = 2 })
+			Debounce:LockState({ _ID = "closeBase", length = 1 })
 
 			local shirt, pant = Data[1], Data[2]
 			local templateTable = Data[3]
@@ -725,7 +731,8 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 
 			print(("Took " .. Time.Get() .. " seconds to load on client %s!"):format(Player.Name))
 		end):catch(function(errorMsg)
-			return if Base.Visible then err(errorMsg) else newNotice(clientConfig.noticeExecErrorText)
+			warn(errorMsg)
+			return if Base.Visible then err() else newNotice(clientConfig.noticeExecErrorText)
 		end)
 	elseif Key == "Config" then
 		clientConfig.key = Data[1]

@@ -283,7 +283,7 @@ function Util:Logical_Any(looper: { boolean }, conditioner: boolean | (nil) -> (
 		elseif conditioner then
 			return conditioner
 		else
-			return true
+			return value
 		end
 	end
 	for _, val in ipairs(looper) do
