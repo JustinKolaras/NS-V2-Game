@@ -6,7 +6,7 @@ local secrets = require(ServerStorage.Storage.Modules.secrets)
 
 local Endpoints = {
 	OUTBOUND_SDS = "https://ns-api-nnrz4.ondigitalocean.app/api/remote/outbound/shutdowns",
-	DELETE_OUTBOUND_SD = "https://ns-api-nnrz4.ondigitalocean.app/api/remote/outbound/shutdowns/%d",
+	DELETE_OUTBOUND_SD = "https://ns-api-nnrz4.ondigitalocean.app/api/remote/outbound/shutdowns/%s",
 }
 
 return function()
@@ -40,9 +40,9 @@ return function()
 				-- Kick
 				local format
 				if reason ~= "" then
-					format = ("Server shutdown by %s: %s\n%s"):format(executorName, reason, tostring(uuid))
+					format = ("Game-wide shutdown by %s: %s\n%s"):format(executorName, reason, tostring(uuid))
 				else
-					format = ("Server shutdown by %s!\n%s"):format(executorName, tostring(uuid))
+					format = ("Game-wide shutdown by %s!\n%s"):format(executorName, tostring(uuid))
 				end
 
 				for _, b in ipairs(Players:GetPlayers()) do
