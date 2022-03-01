@@ -6,9 +6,11 @@ local Messaging = game:GetService("MessagingService")
 local BanService = require(ServerStorage.Storage.Modules.BanService)
 local Admins = require(ServerStorage.Storage.Modules.Admins)
 local Util = require(ReplicatedStorage.Shared.Util)
+local GameModLogs = require(ServerStorage.Storage.WebhookPresets.GameModLogs)
 
 return function(Context, Victim, Reason)
 	local Executor = Context.Executor
+	local VictimName = Players:GetNameFromUserIdAsync(Victim)
 	local isVictimBanned = BanService:GetBanInfo(Victim)
 
 	if Victim == Executor.UserId then
@@ -22,7 +24,7 @@ return function(Context, Victim, Reason)
 	end
 
 	if isVictimBanned then
-		return "Error: " .. Players:GetNameFromUserIdAsync(Victim) .. " is already banned."
+		return "Error: " .. VictimName .. " is already banned."
 	end
 
 	if #Reason > 85 then
@@ -32,10 +34,23 @@ return function(Context, Victim, Reason)
 	local Date = Util:GetUTCDate()
 
 	local Format = ("\nBanned from all servers!\nModerator: %s\nReason: %s\n%s"):format(
-		Players:GetNameFromUserIdAsync(Executor.UserId),
+		Executor.Name,
 		Reason,
 		Date .. " UTC"
 	)
+
+	local err, result = GameModLogs:Send({
+		_TYPE = "Banned",
+		ExecutorName = Executor.Name,
+		VictimName = VictimName,
+		VictimID = Victim,
+		Reason = Reason,
+	})
+
+	if err then
+		warn(result)
+		return ("Error (%s): %s"):format(result.errorStatus, result.errorString)
+	end
 
 	local apiResult = BanService:Add(Victim, Executor.UserId, Reason, Date)
 	if apiResult.status == "error" then
@@ -47,5 +62,5 @@ return function(Context, Victim, Reason)
 		Reason = Format,
 	})
 
-	return ("Banned %s (%s) successfully."):format(Players:GetNameFromUserIdAsync(Victim), Victim)
+	return ("Banned %s (%s) successfully."):format(VictimName, Victim)
 end

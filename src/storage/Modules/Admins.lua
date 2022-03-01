@@ -7,7 +7,6 @@ return {
 
 	--
 
-	1838306853, -- IHateIsabella: Chief Admin & Game Mod
 	161025759, -- anemovenxti: Chief Admin & Game Mod
 	181965530, -- flaxaurial: Chief Admin & Game Mod
 
