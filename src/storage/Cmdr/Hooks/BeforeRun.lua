@@ -18,7 +18,7 @@ return function(registry)
 			and (Context.Executor:GetRankInGroup(8046949) < 254)
 			and (Context.Executor.UserId ~= tonumber("-1"))
 		then
-			return "You must be at or above the rank of Owner to run commands in this category."
+			return "Access Denied"
 		end
 	end)
 end

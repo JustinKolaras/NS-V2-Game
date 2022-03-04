@@ -10,12 +10,12 @@ return function(Context, Victim, Reason)
 	local Executor = Context.Executor
 
 	if Victim == Executor.UserId then
-		return "Error: You can't perform this action on yourself."
+		return "Command failed to execute."
 	end
 
 	for _, b in next, Admins do
 		if b == Victim then
-			return "Error: You can't perform this action on another moderator."
+			return "Command failed to execute."
 		end
 	end
 
@@ -23,5 +23,5 @@ return function(Context, Victim, Reason)
 		return "Error: Reason too long. Cap: 85chars"
 	end
 
-    return "Under maintenance"
+	return "Under maintenance"
 end

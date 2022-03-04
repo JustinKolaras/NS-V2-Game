@@ -14,17 +14,17 @@ return function(Context, Victim, Reason)
 	local isVictimBanned = BanService:GetBanInfo(Victim)
 
 	if Victim == Executor.UserId then
-		return "Error: You can't perform this action on yourself."
+		return "Command failed to execute."
 	end
 
 	for _, b in next, Admins do
 		if b == Victim then
-			return "Error: You can't perform this action on another moderator."
+			return "Command failed to execute."
 		end
 	end
 
 	if isVictimBanned then
-		return "Error: " .. VictimName .. " is already banned."
+		return VictimName .. " is already banned."
 	end
 
 	if #Reason > 85 then

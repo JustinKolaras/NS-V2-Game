@@ -8,11 +8,11 @@ return function(Context, Victim)
 	local VictimBanned = BanService:GetBanInfo(Victim)
 
 	if Victim == Executor.UserId then
-		return "Error: You can't perform actions on yourself."
+		return "Command failed to execute."
 	end
 
 	if not VictimBanned then
-		return "Error: " .. Players:GetNameFromUserIdAsync(Victim) .. " is not banned."
+		return Players:GetNameFromUserIdAsync(Victim) .. " is not banned."
 	end
 
 	local apiResult = BanService:Remove(Victim)

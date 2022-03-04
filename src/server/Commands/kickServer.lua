@@ -6,12 +6,12 @@ return function(Context, Victim, Reason)
 	local Executor = Context.Executor
 
 	if Victim.UserId == Executor.UserId then
-		return "Error: You can't perform this action on yourself."
+		return "Command failed to execute."
 	end
 
 	for _, b in ipairs(Admins) do
 		if b == Victim.UserId then
-			return "You can't perform this action on another moderator."
+			return "Command failed to execute."
 		end
 	end
 
