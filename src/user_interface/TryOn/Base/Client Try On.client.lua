@@ -6,6 +6,8 @@
 
 ]]
 
+script:Destroy()
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local Market = game:GetService("MarketplaceService")
