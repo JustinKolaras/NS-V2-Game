@@ -73,23 +73,23 @@ function Templates.New(Shirt: number, Pant: number): ({ [string]: number })
 	}
 end
 
-local function GetId(Object: Instance): (number | string)
+local function getId(Object: Instance): (number | string)
 	local result = Object:GetAttribute("ID")
 	return result or "nil"
 end
 
-local function IsBagEquipped(Player: Player): (boolean)
+local function isBagEquipped(Player: Player): (boolean)
 	return serverConfig.bagsEquipped[Player.Name]
 end
 
-local function OnClicked(
+local function onClicked(
 	Player: Player,
 	shirtId: number,
 	pantsId: number,
 	templateTable: { [string]: number },
 	character: Model
 ): ()
-	if IsBagEquipped(Player) then
+	if isBagEquipped(Player) then
 		Event:FireClient(Player, "Open", shirtId, pantsId, templateTable, character)
 	end
 end
@@ -97,7 +97,7 @@ end
 local function customOnMouseClick(Player: Player, TheirTool: Tool)
 	local _, MouseTarget = pcall(Function.InvokeClient, Function, Player, "MouseTarget")
 	local shirt, pants
-	if IsBagEquipped(Player) then
+	if isBagEquipped(Player) then
 		if
 			MouseTarget
 			and (
@@ -112,10 +112,10 @@ local function customOnMouseClick(Player: Player, TheirTool: Tool)
 				if
 					(TheirTool.Handle.Position - MouseTarget.Position).Magnitude <= ClickDetector.MaxActivationDistance
 				then
-					OnClicked(
+					onClicked(
 						Player,
-						GetId(shirt),
-						GetId(pants),
+						getId(shirt),
+						getId(pants),
 						Templates.New(shirt.ShirtTemplate:match("%d+"), pants.PantsTemplate:match("%d+")),
 						ClickDetector.Parent.Parent
 					)

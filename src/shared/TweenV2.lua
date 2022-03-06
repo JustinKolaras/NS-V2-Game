@@ -15,7 +15,7 @@ local Config = {
 -- Also runs a "Later" tween
 --[[
     TweenV2:Now({
-        Part = ...,
+        Object = ...,
         Info = ...,
         Properties = ...
     })
@@ -60,7 +60,7 @@ end
     TweenV2:Later({
         _ID = ...,
         Options = {
-            Part = ...,
+            Object = ...,
             Info = ...,
             Properties = ...
         }
@@ -79,7 +79,7 @@ end
     TweenV2:NowAndSave({
         _ID = ...,
         Options = {
-            Part = ...,
+            Object = ...,
             Info = ...,
             Properties = ...
         }

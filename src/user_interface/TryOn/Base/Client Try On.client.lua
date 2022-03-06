@@ -640,7 +640,17 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 			end
 
 			Debounce:LockState({ _ID = "openBase", length = 2 })
-			Debounce:LockState({ _ID = "closeBase", length = 1 })
+
+			CloseButton.TextColor3 = clientConfig.greyOut
+			CloseButton.AutoButtonColor = false
+			Debounce:LockState({
+				_ID = "closeBase",
+				length = 1,
+				callback = function()
+					CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+					CloseButton.AutoButtonColor = true
+				end,
+			})
 
 			local shirt, pant = Data[1], Data[2]
 			local templateTable = Data[3]
@@ -658,7 +668,7 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 			end
 
 			clientConfig.currentPi = characterPi
-			Loading.Text = clientConfig.loadText
+			loadingState()
 			ManType.Visible = false
 			if not Notice.Visible then
 				Base.Visible = true

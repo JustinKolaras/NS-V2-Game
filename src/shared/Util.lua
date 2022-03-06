@@ -32,6 +32,22 @@ function Util:FindAbsoluteAncestor(Ancestor: Instance, Current: Instance): (Inst
 end
 
 --[=[
+	Finds a specific descendant held by the ancestor.
+
+	@param Ancestor Instance -- The ancestor to search through
+	@param Descendant string -- The descendant's name to find
+	@return Instance
+]=]
+function Util:FindFirstDescendant(Ancestor: Instance, Descendant: string): (Instance?)
+	for _, inst in ipairs(Ancestor:GetDescendants()) do
+		if inst.Name == Descendant then
+			return inst
+		end
+	end
+	return nil
+end
+
+--[=[
 	Uses the Promise library to wait for a child of a specific class.
 	If after the timeout (in seconds), there is still no valid child, this function will cancel and resolve.
 
