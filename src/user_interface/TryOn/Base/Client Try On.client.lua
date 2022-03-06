@@ -27,13 +27,16 @@ local Gui = Player.PlayerGui
 local ScreenGui = Gui.TryOn
 
 local Base = ScreenGui.Base
-local Viewport = Base.Mannequin
+local Sidebar = Base.Sidebar
+local SidebarStroke = Sidebar.UIStroke
+local ThreeDTitle = Sidebar["3DTitle"]
+local Viewport = Sidebar.Mannequin
 local BuyOutfit = Base.BuyOutfit
 local BuyShirt = Base.BuyS
 local BuyPant = Base.BuyP
 local TryOn = Base.TryOn
 local CloseButton = Base.X
-local ManType = Base.MannequinType
+local ManType = Sidebar.MannequinType
 local Loading = Base.Loading
 local ErrorNotif = Base.Error
 
@@ -96,6 +99,8 @@ local clientConfig = setmetatable({
 	isAdvancedView = false,
 	advSpeed = 1,
 	connectionBreak3d = false,
+	activeSidebarTween = false,
+	closeDisabled = false,
 	currentPi = 0,
 	originalCFrame3d = 0,
 	storedViewport = 0,
@@ -399,6 +404,33 @@ local function createViewport(templates: { [string]: number })
 	end)
 end
 
+local function tweenSideBar(level: number): ()
+	-- 1: In, 2: Out
+	if level == 1 then
+		clientConfig.activeSidebarTween = false
+		SidebarStroke.Enabled = false
+		ThreeDTitle.Visible = false
+		Sidebar:TweenSizeAndPosition(
+			UDim2.new(0.317, 0, 1.006, 0),
+			UDim2.new(0.157, 0, 0.497, 0),
+			Enum.EasingDirection.Out,
+			Enum.EasingStyle.Quint,
+			0.5
+		)
+	elseif level == 2 then
+		clientConfig.activeSidebarTween = true
+		SidebarStroke.Enabled = true
+		ThreeDTitle.Visible = true
+		Sidebar:TweenSizeAndPosition(
+			UDim2.new(0.559, 0, 1.676, 0),
+			UDim2.new(0.504, 0, 0.497, 0),
+			Enum.EasingDirection.Out,
+			Enum.EasingStyle.Quint,
+			0.5
+		)
+	end
+end
+
 local function noticeConnectionUnit()
 	for _, b in pairs(clientConfig._connections.notice) do
 		if typeof(b) == "RBXScriptConnection" then
@@ -494,13 +526,16 @@ local function mainConnectionUnit(shirtObject: number, pantObject: number)
 	end
 	return Promise.new(function(resolve)
 		clientConfig._connections.terminal.close = CloseButton.MouseButton1Click:Connect(function()
-			if Debounce:State({ _ID = "closeBase" }) then
+			if Debounce:State({ _ID = "closeBase" }) or clientConfig.closeDisabled then
 				return
 			end
 
 			close("Base", 1)
 		end)
 		clientConfig._connections.terminal.tryOn = TryOn.MouseButton1Click:Connect(function()
+			if clientConfig.activeSidebarTween then
+				return
+			end
 			if TryOn.Text == "Try On Outfit" then
 				tryOn(clientConfig.globalTemplates.TemplateS, clientConfig.globalTemplates.TemplateP)
 				close("Base", 1)
@@ -510,7 +545,7 @@ local function mainConnectionUnit(shirtObject: number, pantObject: number)
 			end
 		end)
 		clientConfig._connections.terminal.buyS = BuyShirt.MouseButton1Click:Connect(function()
-			if isOwned(BuyShirt) then
+			if isOwned(BuyShirt) or clientConfig.activeSidebarTween then
 				return
 			end
 			Market:PromptPurchase(Player, shirtObject)
@@ -525,7 +560,7 @@ local function mainConnectionUnit(shirtObject: number, pantObject: number)
 			end)
 		end)
 		clientConfig._connections.terminal.buyP = BuyPant.MouseButton1Click:Connect(function()
-			if isOwned(BuyPant) then
+			if isOwned(BuyPant) or clientConfig.activeSidebarTween then
 				return
 			end
 			Market:PromptPurchase(Player, pantObject)
@@ -540,6 +575,9 @@ local function mainConnectionUnit(shirtObject: number, pantObject: number)
 			end)
 		end)
 		clientConfig._connections.terminal.buyOutfit = BuyOutfit.MouseButton1Click:Connect(function()
+			if clientConfig.activeSidebarTween then
+				return
+			end
 			Market:PromptPurchase(Player, shirtObject)
 			local temp
 			temp = Market.PromptPurchaseFinished:Connect(function(_, assetId, wasPurchased)
@@ -564,6 +602,11 @@ local function mainConnectionUnit(shirtObject: number, pantObject: number)
 			local vpChar = clientConfig.storedViewport
 			vpChar.PrimaryPart = vpChar:FindFirstChild("HumanoidRootPart")
 			if ManType.Text == "2D" then
+				tweenSideBar(2)
+				CloseButton.TextColor3 = clientConfig.greyOut
+				CloseButton.AutoButtonColor = false
+				clientConfig.closeDisabled = true
+
 				local temp
 				clientConfig.originalCFrame3d = vpChar:GetPrimaryPartCFrame()
 				ManType.Text = "3D"
@@ -578,6 +621,11 @@ local function mainConnectionUnit(shirtObject: number, pantObject: number)
 					)
 				end)
 			elseif ManType.Text == "3D" then
+				tweenSideBar(1)
+				CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+				CloseButton.AutoButtonColor = true
+				clientConfig.closeDisabled = false
+
 				clientConfig.connectionBreak3d = true
 				vpChar:SetPrimaryPartCFrame(clientConfig.originalCFrame3d)
 				ManType.Text = "2D"
