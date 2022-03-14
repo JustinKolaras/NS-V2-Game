@@ -39,8 +39,7 @@ return function(Context, Victim, Reason)
 		Date .. " UTC"
 	)
 
-	local err, result = GameModLogs:Send({
-		_TYPE = "Banned",
+	local err, result = GameModLogs:SendBan({
 		ExecutorName = Executor.Name,
 		VictimName = VictimName,
 		VictimID = Victim,

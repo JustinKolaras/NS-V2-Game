@@ -1,5 +1,6 @@
 local ServerStorage = game:GetService("ServerStorage")
 
+local GameModLogs = require(ServerStorage.Storage.WebhookPresets.GameModLogs)
 local Admins = require(ServerStorage.Storage.Modules.Admins)
 
 return function(Context, Victim, Reason)
@@ -17,6 +18,18 @@ return function(Context, Victim, Reason)
 
 	if #Reason > 85 then
 		return "Error: Reason too long. Cap: 85chars"
+	end
+
+	local err, result = GameModLogs:SendKick({
+		ExecutorName = Executor.Name,
+		VictimName = Victim.Name,
+		VictimID = Victim.UserId,
+		Reason = Reason,
+	})
+
+	if err then
+		warn(result)
+		return ("Error (%s): %s"):format(result.errorStatus, result.errorString)
 	end
 
 	Victim:Kick(("\nKicked\nModerator: %s\nReason: %s"):format(Executor.Name, Reason))

@@ -5,6 +5,7 @@ local Players = game:GetService("Players")
 
 local BanService = require(ServerStorage.Storage.Modules.BanService)
 local Util = require(ReplicatedStorage.Shared.Util)
+local GameModLogs = require(ServerStorage.Storage.WebhookPresets.GameModLogs)
 local secrets = require(ServerStorage.Storage.Modules.secrets)
 
 local Endpoints = {
@@ -22,6 +23,7 @@ return function()
 		if data.status == "ok" then
 			for _, dict in ipairs(data.data) do
 				local id, reason, executor = dict.toBanID, dict.reason, dict.executor
+				local executorName = Players:GetNameFromUserIdAsync(executor)
 
 				-- If they have an outgoing unban, we want to ignore them entirely
 				local unbanData = Http:GetAsync(Endpoints.OUTBOUND_UNBANS, false, {
@@ -49,6 +51,18 @@ return function()
 					return
 				end
 
+				-- Send to mod log channel
+				local err, result = GameModLogs:SendBan({
+					ExecutorName = executorName,
+					VictimName = Players:GetNameFromUserIdAsync(id),
+					VictimID = id,
+					Reason = reason,
+				})
+
+				if err then
+					warn(result)
+				end
+
 				-- Add to Roblox DataStore
 				local date = Util:GetUTCDate() .. " UTC"
 				local apiResult = BanService:Add(id, executor, reason, date)
@@ -58,7 +72,7 @@ return function()
 
 				-- Kick if in-game
 				local Format = ("\nBanned from all servers!\nModerator: %s\nReason: %s\n%s"):format(
-					Players:GetNameFromUserIdAsync(executor),
+					executorName,
 					reason,
 					date
 				)

@@ -8,26 +8,10 @@ local secrets = require(ServerStorage.Storage.Modules.secrets)
 local PROXY_URL = "https://ns-api-nnrz4.ondigitalocean.app/api/remote/proxy/discord"
 local GLOBAL_COLOR = 6798026
 
--- Returns a tuple, first boolean representing the success of the operation and second the error response if there is any.
-function GameModLogs:Send(options: { [string]: any })
-	local TEMPLATE = {
-		["embeds"] = {
-			{
-				["title"] = ("Player %s!"):format(options._TYPE),
-				["description"] = ('**%s** banned **%s (%d)**: "%s"'):format(
-					options.ExecutorName,
-					options.VictimName,
-					options.VictimID,
-					options.Reason
-				),
-				["color"] = GLOBAL_COLOR,
-			},
-		},
-	}
-
+function GameModLogs:__Push(Template)
 	local RESPONSE_DATA = {
 		["webhookURL"] = secrets["NS_GAME_MOD_WEBHOOK"],
-		["webhookPayload"] = Http:JSONEncode(TEMPLATE),
+		["webhookPayload"] = Http:JSONEncode(Template),
 	}
 
 	local response = Http:PostAsync(
@@ -46,6 +30,65 @@ function GameModLogs:Send(options: { [string]: any })
 	end
 
 	return false
+end
+
+-- Returns a tuple, first boolean representing the success of the operation and second the error response if there is any.
+function GameModLogs:SendBan(options: { [string]: any })
+	local TEMPLATE = {
+		["embeds"] = {
+			{
+				["title"] = "Player Banned!",
+				["description"] = ('**%s** banned **%s (%d)**: "%s"'):format(
+					options.ExecutorName,
+					options.VictimName,
+					options.VictimID,
+					options.Reason
+				),
+				["color"] = GLOBAL_COLOR,
+			},
+		},
+	}
+
+	return GameModLogs:__Push(TEMPLATE)
+end
+
+-- Returns a tuple, first boolean representing the success of the operation and second the error response if there is any.
+function GameModLogs:SendUnban(options: { [string]: any })
+	local TEMPLATE = {
+		["embeds"] = {
+			{
+				["title"] = "Player Unbanned!",
+				["description"] = ("**%s** unbanned **%s (%d)**"):format(
+					options.ExecutorName,
+					options.VictimName,
+					options.VictimID
+				),
+				["color"] = GLOBAL_COLOR,
+			},
+		},
+	}
+
+	return GameModLogs:__Push(TEMPLATE)
+end
+
+-- Returns a tuple, first boolean representing the success of the operation and second the error response if there is any.
+function GameModLogs:SendKick(options: { [string]: any })
+	local TEMPLATE = {
+		["embeds"] = {
+			{
+				["title"] = "Player Kicked!",
+				["description"] = ('**%s** kicked **%s (%d)**: "%s"'):format(
+					options.ExecutorName,
+					options.VictimName,
+					options.VictimID,
+					options.Reason
+				),
+				["color"] = GLOBAL_COLOR,
+			},
+		},
+	}
+
+	return GameModLogs:__Push(TEMPLATE)
 end
 
 return GameModLogs

@@ -2,9 +2,11 @@ local ServerStorage = game:GetService("ServerStorage")
 local Players = game:GetService("Players")
 
 local BanService = require(ServerStorage.Storage.Modules.BanService)
+local GameModLogs = require(ServerStorage.Storage.WebhookPresets.GameModLogs)
 
 return function(Context, Victim)
 	local Executor = Context.Executor
+	local VictimName = Players:GetNameFromUserIdAsync(Victim)
 	local VictimBanned = BanService:GetBanInfo(Victim)
 
 	if Victim == Executor.UserId then
@@ -12,7 +14,18 @@ return function(Context, Victim)
 	end
 
 	if not VictimBanned then
-		return Players:GetNameFromUserIdAsync(Victim) .. " is not banned."
+		return VictimName .. " is not banned."
+	end
+
+	local err, result = GameModLogs:SendUnban({
+		ExecutorName = Executor.Name,
+		VictimName = VictimName,
+		VictimID = Victim,
+	})
+
+	if err then
+		warn(result)
+		return ("Error (%s): %s"):format(result.errorStatus, result.errorString)
 	end
 
 	local apiResult = BanService:Remove(Victim)
@@ -20,5 +33,5 @@ return function(Context, Victim)
 		return "Error: " .. apiResult.error
 	end
 
-	return ("Unbanned %s (%s) successfully."):format(Players:GetNameFromUserIdAsync(Victim), Victim)
+	return ("Unbanned %s (%s) successfully."):format(VictimName, Victim)
 end
