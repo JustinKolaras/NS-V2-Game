@@ -6,8 +6,6 @@
 
 ]]
 
-script:Destroy()
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local Market = game:GetService("MarketplaceService")
@@ -50,6 +48,20 @@ local AdvTrigger = AdvTriggFrame.Trigger
 local Notice = ScreenGui.Notice
 local NoticeCloseButton = Notice.X
 local NoticeDesc = Notice.Desc
+local NoticeHeader = Notice.Error
+local NoticeAddress = Notice.Address
+local NoticeDiscord = Notice.Discord
+
+local TryOnPrompt = ScreenGui.TryOn_Prompt
+local ShirtOption = TryOnPrompt.Shirt
+local PantsOption = TryOnPrompt.Pants
+local BothOption = TryOnPrompt.Both
+local TryOnPromptCloseButton = TryOnPrompt.X
+
+local MergePrompt = ScreenGui.Merge_Prompt
+local YesMerge = MergePrompt.Merge
+local NoMerge = MergePrompt.No
+local MergeCloseButton = MergePrompt.X
 
 local TryOnFolder = ReplicatedStorage:FindFirstChild("TryOn")
 
@@ -82,6 +94,17 @@ local clientConfig = setmetatable({
 		notice = {
 			close = 0,
 		},
+		tryOnOptions = {
+			shirt = 0,
+			pants = 0,
+			both = 0,
+			close = 0,
+		},
+		mergeOptions = {
+			yes = 0,
+			no = 0,
+			close = 0,
+		},
 		died = 0,
 		clientEvent = 0,
 	},
@@ -108,6 +131,15 @@ local clientConfig = setmetatable({
 	buyIndividualObjectYScale = 0.395,
 	tryOnObjectYScale = 0.14,
 	greyOut = Color3.fromRGB(118, 118, 118),
+	centeredNoticeDesc = UDim2.new(0.042, 0, 0.148, 0),
+	loweredNoticeDesc = UDim2.new(0.042, 0, 0.187, 0),
+	-- NEW
+	tryOnOptionsOpen = false,
+	mergePromptOpen = false,
+	currentTryOnType = "", -- "Shirt", "Pants", "Both"
+	canMerge = false,
+	isMerging = false,
+	-- END NEW
 	advExFunc = 0,
 	globalTemplates = {
 		TemplateS = 0,
@@ -205,7 +237,7 @@ local function fireServer(...: any): ()
 	Event:FireServer(clientConfig.key, ...)
 end
 
-local function tryOn(...: number): ()
+local function tryOn(...: any): ()
 	AdvTriggFrame.Visible = true
 	TryOn.Text = "Take Off Outfit"
 	clientConfig.isTryingOn = true
@@ -216,6 +248,7 @@ local function takeOff(): ()
 	fireServer("TakeOff")
 	TryOn.Text = "Try On Outfit"
 	clientConfig.isTryingOn = false
+	clientConfig.currentTryOnType = ""
 end
 
 local function getPi(mannequin: Model): (string)
@@ -223,6 +256,18 @@ local function getPi(mannequin: Model): (string)
 	assert(value, "getPi: No personal identification value")
 	value = tostring(value)
 	return value
+end
+
+local function getOppositeTryOnType(currentType: string): (string)
+	if currentType == "Shirt" then
+		return "Pants"
+	elseif currentType == "Pants" then
+		return "Shirt"
+	elseif currentType == "Both" then
+		return "Both"
+	else
+		error("Invalid type")
+	end
 end
 
 -- This function doesn't work properly in a certain way, but I'm not using it
@@ -431,6 +476,74 @@ local function tweenSideBar(level: number): ()
 	end
 end
 
+local function tryOnOptionsConnectionUnit(shirtObject: number, pantObject: number)
+	for _, b in pairs(clientConfig._connections.tryOnOptions) do
+		if typeof(b) == "RBXScriptConnection" then
+			b:Disconnect()
+			b = nil
+		end
+	end
+	return Promise.new(function(resolve)
+		clientConfig._connections.tryOnOptions.shirt = ShirtOption.MouseButton1Click:Connect(function()
+			tryOn("Shirt", { Shirt = shirtObject })
+			TryOnPrompt.Visible = false
+			clientConfig.tryOnOptionsOpen = false
+			clientConfig.currentTryOnType = "Shirt"
+			clientConfig.canMerge = true
+			close("Base", 1)
+		end)
+		clientConfig._connections.tryOnOptions.pants = PantsOption.MouseButton1Click:Connect(function()
+			tryOn("Pants", { Pants = pantObject })
+			TryOnPrompt.Visible = false
+			clientConfig.tryOnOptionsOpen = false
+			clientConfig.currentTryOnType = "Pants"
+			clientConfig.canMerge = true
+			close("Base", 1)
+		end)
+		clientConfig._connections.tryOnOptions.both = BothOption.MouseButton1Click:Connect(function()
+			tryOn("Both", { Shirt = shirtObject, Pants = pantObject })
+			TryOnPrompt.Visible = false
+			clientConfig.tryOnOptionsOpen = false
+			clientConfig.currentTryOnType = "Both"
+			close("Base", 1)
+		end)
+		clientConfig._connections.tryOnOptions.close = TryOnPromptCloseButton.MouseButton1Click:Connect(function()
+			Base.Visible = true
+			TryOnPrompt.Visible = false
+			clientConfig.tryOnOptionsOpen = false
+		end)
+		resolve()
+	end)
+end
+
+local function mergeOptionsConnectionUnit(shirtObject: number, pantObject: number)
+	for _, b in pairs(clientConfig._connections.tryOnOptions) do
+		if typeof(b) == "RBXScriptConnection" then
+			b:Disconnect()
+			b = nil
+		end
+	end
+	return Promise.new(function(resolve)
+		clientConfig._connections.mergeOptions.yes = YesMerge.MouseButton1Click:Connect(function()
+			local oppositeType = getOppositeTryOnType(clientConfig.currentTryOnType)
+			tryOn(oppositeType, { Shirt = shirtObject, Pants = pantObject })
+			MergePrompt.Visible = false
+			clientConfig.mergePromptOpen = false
+			clientConfig.canMerge = false
+		end)
+		clientConfig._connections.mergeOptions.no = NoMerge.MouseButton1Click:Connect(function()
+			takeOff()
+			MergePrompt.Visible = false
+			clientConfig.mergePromptOpen = false
+		end)
+		clientConfig._connections.mergeOptions.close = MergeCloseButton.MouseButton1Click:Connect(function()
+			MergePrompt.Visible = false
+			clientConfig.mergePromptOpen = false
+		end)
+		resolve()
+	end)
+end
+
 local function noticeConnectionUnit()
 	for _, b in pairs(clientConfig._connections.notice) do
 		if typeof(b) == "RBXScriptConnection" then
@@ -446,9 +559,28 @@ local function noticeConnectionUnit()
 	end)
 end
 
-local function newNotice(noticeText: string): ()
+local function newNotice(noticeText: string, options: { [string]: any }): ()
 	noticeConnectionUnit():catch(error):await()
 	NoticeDesc.Text = noticeText
+
+	if options.headerError and typeof(options.headerError) == "string" then
+		NoticeHeader.Text = ("<b>Error:</b> %s"):format(options.headerError)
+		NoticeHeader.Visible = true
+	end
+	if options.address and typeof(options.address) == "table" then
+		NoticeAddress.Text = ("@%s %s"):format(options.address.pointer, options.address.context)
+		NoticeAddress.Visible = true
+	end
+	if options.showDiscord and typeof(options.showDiscord) == "boolean" then
+		NoticeDiscord.Visible = true
+	end
+
+	if NoticeAddress.Visible or NoticeDiscord.Visible then
+		NoticeDesc.Position = clientConfig.loweredNoticeDesc
+	else
+		NoticeDesc.Position = clientConfig.centeredNoticeDesc
+	end
+
 	Notice.Visible = true
 end
 
@@ -537,8 +669,10 @@ local function mainConnectionUnit(shirtObject: number, pantObject: number)
 				return
 			end
 			if TryOn.Text == "Try On Outfit" then
-				tryOn(clientConfig.globalTemplates.TemplateS, clientConfig.globalTemplates.TemplateP)
-				close("Base", 1)
+				tryOnOptionsConnectionUnit(shirtObject, pantObject):catch(error):await()
+				Base.Visible = false -- We may need to reopen it.
+				TryOnPrompt.Visible = true
+				clientConfig.tryOnOptionsOpen = true
 			elseif TryOn.Text == "Take Off Outfit" then
 				takeOff()
 				close("Base")
@@ -712,6 +846,12 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 
 			if characterPi ~= clientConfig.currentPi then
 				if clientConfig.isTryingOn then
+					if clientConfig.canMerge then
+						mergeOptionsConnectionUnit(shirt, pant):catch(error):await()
+						MergePrompt.Visible = true
+						clientConfig.mergePromptOpen = true
+						return
+					end
 					takeOff()
 					AdvTriggFrame.Visible = false
 				end
@@ -719,6 +859,7 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 
 			clientConfig.currentPi = characterPi
 			loadingState()
+			tweenSideBar(1)
 			ManType.Visible = false
 			if not Notice.Visible then
 				Base.Visible = true
@@ -792,7 +933,15 @@ clientConfig._connections.clientEvent = Event.OnClientEvent:Connect(function(Key
 			print(("Took " .. Time.Get() .. " seconds to load on client %s!"):format(Player.Name))
 		end):catch(function(errorMsg)
 			warn(errorMsg)
-			return if Base.Visible then err() else newNotice(clientConfig.noticeExecErrorText)
+			if Base.Visible then
+				err()
+			else
+				newNotice(clientConfig.noticeExecErrorText, {
+					headerError = "Execution Error",
+					address = { pointer = "mainLoad", context = "ExecError" },
+					showDiscord = true,
+				})
+			end
 		end)
 	elseif Key == "Config" then
 		clientConfig.key = Data[1]
@@ -810,6 +959,10 @@ Util:WaitForChildOfClass(Player.Character, "Humanoid", 2):andThen(function(resul
 		clientConfig._connections.died = result.Died:Connect(function()
 			if Base.Visible then
 				close("Base")
+			end
+			if clientConfig.tryOnOptionsOpen then
+				TryOnPrompt.Visible = false
+				clientConfig.tryOnOptionsOpen = false
 			end
 			if clientConfig.isTryingOn then
 				takeOff()

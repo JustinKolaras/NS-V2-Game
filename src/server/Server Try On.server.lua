@@ -30,7 +30,7 @@ end
 
 local serverConfig = setmetatable({
 	Keys = {},
-	templatePrefix = "http://www.roblox.com/asset/?id=%s",
+	templatePrefix = "http://www.roblox.com/asset/?id=%d",
 	toolName = "Shopping Bag",
 	originalClothes = {},
 	bagsEquipped = {},
@@ -131,22 +131,41 @@ Event.OnServerEvent:Connect(function(Player: Player, ClientKey: string, Starter:
 		if Starter == "TryOn" then
 			local Character = Player.Character
 			local cShirt, cPants = Character.Shirt, Character.Pants
-			local s, p = Data[1], Data[2]
-			serverConfig.originalClothes[Player.Name] = {}
-			serverConfig.originalClothes[Player.Name]["Shirt"] = cShirt.ShirtTemplate:match("%d+")
-			serverConfig.originalClothes[Player.Name]["Pants"] = cPants.PantsTemplate:match("%d+")
-			cShirt.ShirtTemplate = serverConfig.templatePrefix:format(s)
-			cPants.PantsTemplate = serverConfig.templatePrefix:format(p)
+			local optionType = Data[1]
+			local shirt, pants = Data[2].Shirt or 0, Data[2].Pants or 0
+			local formattedShirt = serverConfig.templatePrefix:format(shirt)
+			local formattedPants = serverConfig.templatePrefix:format(pants)
+			if optionType == "Shirt" then
+				serverConfig.originalClothes[Player.Name] = {}
+				serverConfig.originalClothes[Player.Name]["Shirt"] = cShirt.ShirtTemplate:match("%d+")
+				cShirt.ShirtTemplate = formattedShirt -- error line
+			elseif optionType == "Pants" then
+				serverConfig.originalClothes[Player.Name] = {}
+				serverConfig.originalClothes[Player.Name]["Pants"] = cPants.PantsTemplate:match("%d+")
+				cPants.PantsTemplate = formattedPants -- error line
+			elseif optionType == "Both" then
+				serverConfig.originalClothes[Player.Name] = {}
+				serverConfig.originalClothes[Player.Name]["Shirt"] = cShirt.ShirtTemplate:match("%d+")
+				serverConfig.originalClothes[Player.Name]["Pants"] = cPants.PantsTemplate:match("%d+")
+				cShirt.ShirtTemplate = formattedShirt -- error line
+				cPants.PantsTemplate = formattedPants -- error line
+			end
 		elseif Starter == "TakeOff" then
 			local Character = Player.Character
 			local cShirt, cPants = Character.Shirt, Character.Pants
 			if serverConfig.originalClothes[Player.Name] then
-				cShirt.ShirtTemplate = serverConfig.templatePrefix:format(
-					serverConfig.originalClothes[Player.Name]["Shirt"]
-				)
-				cPants.PantsTemplate = serverConfig.templatePrefix:format(
-					serverConfig.originalClothes[Player.Name]["Pants"]
-				)
+				local shirtData = serverConfig.originalClothes[Player.Name]["Shirt"]
+				local pantsData = serverConfig.originalClothes[Player.Name]["Pants"]
+				if shirtData then
+					cShirt.ShirtTemplate = serverConfig.templatePrefix:format(
+						serverConfig.originalClothes[Player.Name]["Shirt"]
+					)
+				end
+				if pantsData then
+					cPants.PantsTemplate = serverConfig.templatePrefix:format(
+						serverConfig.originalClothes[Player.Name]["Pants"]
+					)
+				end
 				serverConfig.originalClothes[Player.Name] = nil
 			end
 		end
