@@ -85,6 +85,6 @@ return function()
 		else
 			error(data.error)
 		end
-		task.wait(5)
+		task.wait(10)
 	end
 end
