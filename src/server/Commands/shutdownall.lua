@@ -2,7 +2,7 @@ return {
 	Name = "shutdownall",
 	Aliases = { "sdall" },
 	Description = "Kicks everyone (including you) from all servers in the game.",
-	Group = "Admin",
+	Group = "Command",
 	Args = {
 		{
 			Type = "string",

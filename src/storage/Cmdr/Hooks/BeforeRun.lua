@@ -4,6 +4,8 @@
 	Owner - Roleset 254+ (Owner)
 ]]
 
+local CommandTeam = require(game:GetService("ServerStorage").Storage.Modules.Command)
+
 return function(registry)
 	registry:RegisterHook("BeforeRun", function(Context)
 		if (Context.Executor:GetRankInGroup(8046949) < 252) and (Context.Executor.UserId ~= tonumber("-1")) then
@@ -11,7 +13,9 @@ return function(registry)
 			return "Access Denied"
 		end
 
-		-- Access is by default granted to every Moderator, so we just have to restrict the Owner-only commands.
+		if Context.Group == "Command" and not table.find(CommandTeam, Context.Executor.UserId) then
+			return "Access Denied"
+		end
 
 		if
 			(Context.Group == "Owner")
