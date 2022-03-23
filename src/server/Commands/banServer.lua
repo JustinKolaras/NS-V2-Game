@@ -4,7 +4,7 @@ local Players = game:GetService("Players")
 local Messaging = game:GetService("MessagingService")
 
 local BanService = require(ServerStorage.Storage.Modules.BanService)
-local Admins = require(ServerStorage.Storage.Modules.Admins)
+local Admins = require(ReplicatedStorage.Shared.Admins)
 local Util = require(ReplicatedStorage.Shared.Util)
 local GameModLogs = require(ServerStorage.Storage.WebhookPresets.GameModLogs)
 
@@ -14,12 +14,12 @@ return function(Context, Victim, Reason)
 	local isVictimBanned = BanService:GetBanInfo(Victim)
 
 	if Victim == Executor.UserId then
-		return "Command failed to execute."
+		return "Access Denied"
 	end
 
 	for _, b in next, Admins do
 		if b == Victim then
-			return "Command failed to execute."
+			return "Access Denied"
 		end
 	end
 

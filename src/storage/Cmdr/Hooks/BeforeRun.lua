@@ -4,7 +4,7 @@
 	Owner - Roleset 254+ (Owner)
 ]]
 
-local CommandTeam = require(game:GetService("ServerStorage").Storage.Modules.Command)
+local CommandTeam = require(game:GetService("ReplicatedStorage").Shared.Command)
 
 return function(registry)
 	registry:RegisterHook("BeforeRun", function(Context)

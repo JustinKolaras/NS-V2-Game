@@ -1,18 +1,19 @@
 local ServerStorage = game:GetService("ServerStorage")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local GameModLogs = require(ServerStorage.Storage.WebhookPresets.GameModLogs)
-local Admins = require(ServerStorage.Storage.Modules.Admins)
+local Admins = require(ReplicatedStorage.Shared.Admins)
 
 return function(Context, Victim, Reason)
 	local Executor = Context.Executor
 
 	if Victim.UserId == Executor.UserId then
-		return "Command failed to execute."
+		return "Access Denied"
 	end
 
 	for _, b in ipairs(Admins) do
 		if b == Victim.UserId then
-			return "Command failed to execute."
+			return "Access Denied"
 		end
 	end
 

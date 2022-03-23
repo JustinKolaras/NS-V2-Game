@@ -3,19 +3,19 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local Messaging = game:GetService("MessagingService")
 
-local Admins = require(ServerStorage.Storage.Modules.Admins)
+local Admins = require(ReplicatedStorage.Shared.Admins)
 local Util = require(ReplicatedStorage.Shared.Util)
 
 return function(Context, Victim, Reason)
 	local Executor = Context.Executor
 
 	if Victim == Executor.UserId then
-		return "Command failed to execute."
+		return "Access Denied"
 	end
 
 	for _, b in next, Admins do
 		if b == Victim then
-			return "Command failed to execute."
+			return "Access Denied"
 		end
 	end
 

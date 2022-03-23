@@ -10,7 +10,7 @@ return function(Context, Victim)
 	local VictimBanned = BanService:GetBanInfo(Victim)
 
 	if Victim == Executor.UserId then
-		return "Command failed to execute."
+		return "Access Denied"
 	end
 
 	if not VictimBanned then
