@@ -27,7 +27,7 @@ function Util:FindAbsoluteAncestor(Ancestor: Instance, Current: Instance): (Inst
 		elseif toReturn then
 			toReturn = toReturn.Parent
 		end
-	until (toReturn.Name == Ancestor.Name) and (toReturn.ClassName == Ancestor.ClassName)
+	until toReturn == Ancestor
 	return toReturn
 end
 
