@@ -25,7 +25,7 @@ end
 -- Returns false if the debounce isn't currently pending
 function Debounce:State(options: { [string]: any }): (boolean)
 	local ID = options._ID
-	return if Config.Index[ID] then true else false
+	return if Config.Index[ID] then true else false -- This seems unusual, but Config.Index[ID] would normally return the actual value; not a bool.
 end
 
 -- Force cahnges a Debounce ID's state
