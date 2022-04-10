@@ -429,10 +429,10 @@ local function createViewport(templates: { [string]: number })
 		local newModel = Util:Create("Model", { Name = "Character", Parent = Viewport })
 
 		local hrp = clone:FindFirstChild("HumanoidRootPart")
+		local head = clone:FindFirstChild("Head")
+		head["default face"]:Destroy()
+
 		for _, b in ipairs(clone:GetChildren()) do
-			if b.Name == "Head" then
-				b["default face"]:Destroy()
-			end
 			if b:IsA("BasePart") then
 				b.CFrame *= CFrame.Angles(0, math.rad(180), 0)
 			end
