@@ -232,17 +232,14 @@ end
 function Util:GetUTCDate(): (string)
 	local utcTime = os.date("!*t")
 
-	return utcTime.year
-		.. "-"
-		.. Util:PrefaceZeroes(utcTime.month, 2)
-		.. "-"
-		.. Util:PrefaceZeroes(utcTime.day, 2)
-		.. " "
-		.. Util:PrefaceZeroes(utcTime.hour, 2)
-		.. ":"
-		.. Util:PrefaceZeroes(utcTime.min, 2)
-		.. ":"
-		.. Util:PrefaceZeroes(utcTime.sec, 2)
+	return ("%s-%s-%s %s:%s:%s"):format(
+		Util:PrefaceZeroes(utcTime.year, 4),
+		Util:PrefaceZeroes(utcTime.month, 2),
+		Util:PrefaceZeroes(utcTime.day, 2),
+		Util:PrefaceZeroes(utcTime.hour, 2),
+		Util:PrefaceZeroes(utcTime.min, 2),
+		Util:PrefaceZeroes(utcTime.sec, 2)
+	)
 end
 
 --[=[
