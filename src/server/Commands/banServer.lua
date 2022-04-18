@@ -8,42 +8,41 @@ local Admins = require(ReplicatedStorage.Shared.Admins)
 local Util = require(ReplicatedStorage.Shared.Util)
 local GameModLogs = require(ServerStorage.Storage.WebhookPresets.GameModLogs)
 
-return function(Context, Victim, Reason)
-	local Executor = Context.Executor
-	local VictimName = Players:GetNameFromUserIdAsync(Victim)
-	local isVictimBanned = BanService:GetBanInfo(Victim)
+return function(context, victim, reason)
+	local executor = context.executor
+	local victimName = Players:GetNameFromUserIdAsync(victim)
+	local isVictimBanned = BanService:GetBanInfo(victim)
 
-	if Victim == Executor.UserId then
+	if victim == executor.UserId then
 		return "Access Denied"
 	end
 
-	for _, b in next, Admins do
-		if b == Victim then
+	for _, b in ipairs(Admins) do
+		if b == victim then
 			return "Access Denied"
 		end
 	end
 
 	if isVictimBanned then
-		return VictimName .. " is already banned."
+		return victimName .. " is already banned."
 	end
 
-	if #Reason > 85 then
-		return "Error: Reason too long. Cap: 85chars"
+	if #reason > 85 then
+		return "Reason too long. Cap: 85 Characters"
 	end
 
-	local Date = Util:GetUTCDate()
-
+	local date = Util:GetUTCDate()
 	local Format = ("\nBanned from all servers!\nModerator: %s\nReason: %s\n%s"):format(
-		Executor.Name,
-		Reason,
-		Date .. " UTC"
+		executor.Name,
+		reason,
+		date .. " UTC"
 	)
 
 	local err, result = GameModLogs:SendBan({
-		ExecutorName = Executor.Name,
-		VictimName = VictimName,
-		VictimID = Victim,
-		Reason = Reason,
+		ExecutorName = executor.Name,
+		VictimName = victimName,
+		VictimID = victim,
+		Reason = reason,
 	})
 
 	if err then
@@ -51,15 +50,15 @@ return function(Context, Victim, Reason)
 		return ("Error (%s): %s"):format(result.errorStatus, result.errorString)
 	end
 
-	local apiResult = BanService:Add(Victim, Executor.UserId, Reason, Date)
+	local apiResult = BanService:Add(victim, executor.UserId, reason, date)
 	if apiResult.status == "error" then
 		return "Error: " .. apiResult.error
 	end
 
 	Messaging:PublishAsync("Servers:Kick", {
-		UserId = Victim,
+		UserId = victim,
 		Reason = Format,
 	})
 
-	return ("Banned %s (%s) successfully."):format(VictimName, Victim)
+	return ("Banned %s (%s) successfully."):format(victimName, victim)
 end

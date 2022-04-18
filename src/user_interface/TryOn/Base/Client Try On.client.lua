@@ -111,14 +111,6 @@ local clientConfig = setmetatable({
 	_promise = {
 		mainLoad = 0,
 	},
-	--[[
-	_db = {
-		openBase = false,
-		closeBase = false,
-		avTrigg = false,
-		avExit = false,
-	},
-	--]]
 	isAdvancedView = false,
 	advSpeed = 1,
 	connectionBreak3d = false,
@@ -133,13 +125,11 @@ local clientConfig = setmetatable({
 	greyOut = Color3.fromRGB(118, 118, 118),
 	centeredNoticeDesc = UDim2.new(0.042, 0, 0.148, 0),
 	loweredNoticeDesc = UDim2.new(0.042, 0, 0.187, 0),
-	-- NEW
 	tryOnOptionsOpen = false,
 	mergePromptOpen = false,
 	currentTryOnType = "", -- "Shirt", "Pants", "Both"
 	canMerge = false,
 	isMerging = false,
-	-- END NEW
 	advExFunc = 0,
 	globalTemplates = {
 		TemplateS = 0,
